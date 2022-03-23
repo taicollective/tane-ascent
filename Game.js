@@ -66,6 +66,10 @@ class Game extends Phaser.Scene {
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fbg_layer1.png?v=1603605919212"
     );
     this.load.image(
+      "background2",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/41-space-scrolling-background850.jpg?v=1648000578139"
+    );
+    this.load.image(
       "kowhaiwhai",
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fkowhaiwhai.png?v=1609392792102"
     );
@@ -333,18 +337,18 @@ class Game extends Phaser.Scene {
       },
     });
 
-    this.add.image(240, 320, "background").setScrollFactor(1, 0);
-    this.add
-      .tileSprite(
-        game.config.width / 2,
-        game.config.height / 2,
-        game.config.width,
-        3000,
-        "kowhaiwhai"
-      )
-      .setScrollFactor(0, 0.25)
-      .setAlpha(0.2)
-      .setScale(1);
+    this.add.image(240, -1300, "background2");
+    // this.add
+    //   .tileSprite(
+    //     game.config.width / 2,
+    //     game.config.height / 2,
+    //     game.config.width,
+    //     3000,
+    //     "kowhaiwhai"
+    //   )
+    //   .setScrollFactor(0, 0.25)
+    //   .setAlpha(0.2)
+    //   .setScale(1);
 
     // token types
     // this.add.image(game.config.width - 60, 50, "bronze-token-type").setScrollFactor(0).setScale(0.2).setDepth(100)
