@@ -42,7 +42,7 @@ window.onload = function () {
         gravity: {
           y: 600,
         },
-        debug: false,
+        debug: true,
       },
     },
     scene: [Game, GameOver, YouWin],
@@ -334,7 +334,7 @@ class Game extends Phaser.Scene {
       delay: 3000,
     };
     this.music = this.sound.add("music", musicConfig);
-    this.music.play();
+    // this.music.play();
 
     // load google font
     WebFont.load({
@@ -355,11 +355,11 @@ class Game extends Phaser.Scene {
       },
     });
 
-    this.add.image(300, -2000, "bg1");
-    this.add.image(300, -2000, "bg2");
-    this.add.image(300, -2000, "bg3");
-    this.add.image(300, -2000, "bg4");
-    this.add.image(300, -2000, "heaven");
+    this.add.image(300, -3400, "bg1");
+    this.add.image(300, -3400, "bg2").setScrollFactor(0.8);
+    this.add.image(300, -3400, "bg3").setScrollFactor(0.9);
+    this.add.image(300, -3400, "bg4").setScrollFactor(0.7);
+    this.add.image(300, -3400, "heaven");
     // this.add
     //   .tileSprite(
     //     game.config.width / 2,
@@ -380,173 +380,173 @@ class Game extends Phaser.Scene {
     // ========== TOKEN METERS
     // Bronze token type
     // the token container. A simple sprite
-    let tokenBronze = this.add
-      .sprite(game.config.width - 60, 50, "bronze-token-type")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(100);
-    // the energy bar. Another simple sprite
-    this.tokenBronzeBar = this.add
-      .sprite(tokenBronze.x, tokenBronze.y + 75, "bronze-token-overlay")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(100);
-    // a copy of the energy bar to be used as a mask. Another simple sprite but...
-    //energybar width is 500px (at 0.2 scale energybar width is 100px)
-    this.tokenBronzeMask = this.add
-      .sprite(tokenBronze.x, tokenBronze.y, "bronze-token-mask")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(100);
-    this.tokenBronzeMask.visible = true;
-    // and we assign it as energyBar's mask.
-    this.tokenBronzeBar.mask = new Phaser.Display.Masks.BitmapMask(
-      this,
-      this.tokenBronzeMask
-    );
-    // create a group for the gold tab
-    this.tokenBronzeTabGroup = this.add.group();
-    this.tokenBronzeTab = this.add
-      .sprite(game.config.width - 110, 50, "bronze-token-tab")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(99);
-    this.tokenBronzeHand = this.add
-      .sprite(game.config.width - 130, 50, "hand")
-      .setScrollFactor(0)
-      .setScale(0.12)
-      .setDepth(99);
-    this.tokenBronzeTabGroup.addMultiple([
-      this.tokenBronzeTab,
-      this.tokenBronzeHand,
-    ]);
-    // hand animation
-    this.tweens.add({
-      targets: this.tokenBronzeHand,
-      x: game.config.width - 125,
-      duration: 500,
-      ease: "Back.easeIn ",
-      yoyo: true,
-      loop: -1,
-    });
-    this.tokenBronzeTabGroup.toggleVisible();
+//     let tokenBronze = this.add
+//       .sprite(game.config.width - 60, 50, "bronze-token-type")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(100);
+//     // the energy bar. Another simple sprite
+//     this.tokenBronzeBar = this.add
+//       .sprite(tokenBronze.x, tokenBronze.y + 75, "bronze-token-overlay")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(100);
+//     // a copy of the energy bar to be used as a mask. Another simple sprite but...
+//     //energybar width is 500px (at 0.2 scale energybar width is 100px)
+//     this.tokenBronzeMask = this.add
+//       .sprite(tokenBronze.x, tokenBronze.y, "bronze-token-mask")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(100);
+//     this.tokenBronzeMask.visible = true;
+//     // and we assign it as energyBar's mask.
+//     this.tokenBronzeBar.mask = new Phaser.Display.Masks.BitmapMask(
+//       this,
+//       this.tokenBronzeMask
+//     );
+//     // create a group for the gold tab
+//     this.tokenBronzeTabGroup = this.add.group();
+//     this.tokenBronzeTab = this.add
+//       .sprite(game.config.width - 110, 50, "bronze-token-tab")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(99);
+//     this.tokenBronzeHand = this.add
+//       .sprite(game.config.width - 130, 50, "hand")
+//       .setScrollFactor(0)
+//       .setScale(0.12)
+//       .setDepth(99);
+//     this.tokenBronzeTabGroup.addMultiple([
+//       this.tokenBronzeTab,
+//       this.tokenBronzeHand,
+//     ]);
+//     // hand animation
+//     this.tweens.add({
+//       targets: this.tokenBronzeHand,
+//       x: game.config.width - 125,
+//       duration: 500,
+//       ease: "Back.easeIn ",
+//       yoyo: true,
+//       loop: -1,
+//     });
+//     this.tokenBronzeTabGroup.toggleVisible();
 
-    // Silver token type
-    let tokenSilver = this.add
-      .sprite(game.config.width - 60, 150, "silver-token-type")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(100);
-    this.tokenSilverBar = this.add
-      .sprite(tokenSilver.x, tokenSilver.y + 75, "silver-token-overlay")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(100);
-    this.tokenSilverMask = this.add
-      .sprite(tokenSilver.x, tokenSilver.y, "silver-token-mask")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(100);
-    this.tokenSilverMask.visible = true;
-    this.tokenSilverBar.mask = new Phaser.Display.Masks.BitmapMask(
-      this,
-      this.tokenSilverMask
-    );
-    // create a group for the gold tab
-    this.tokenSilverTabGroup = this.add.group();
-    this.tokenSilverTab = this.add
-      .sprite(game.config.width - 110, 150, "silver-token-tab")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(99);
-    this.tokenSilverHand = this.add
-      .sprite(game.config.width - 130, 150, "hand")
-      .setScrollFactor(0)
-      .setScale(0.12)
-      .setDepth(99);
-    this.tokenSilverTabGroup.addMultiple([
-      this.tokenSilverTab,
-      this.tokenSilverHand,
-    ]);
-    // hand animation
-    this.tweens.add({
-      targets: this.tokenSilverHand,
-      x: game.config.width - 125,
-      duration: 500,
-      ease: "Back.easeIn ",
-      yoyo: true,
-      loop: -1,
-    });
-    this.tokenSilverTabGroup.toggleVisible();
+//     // Silver token type
+//     let tokenSilver = this.add
+//       .sprite(game.config.width - 60, 150, "silver-token-type")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(100);
+//     this.tokenSilverBar = this.add
+//       .sprite(tokenSilver.x, tokenSilver.y + 75, "silver-token-overlay")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(100);
+//     this.tokenSilverMask = this.add
+//       .sprite(tokenSilver.x, tokenSilver.y, "silver-token-mask")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(100);
+//     this.tokenSilverMask.visible = true;
+//     this.tokenSilverBar.mask = new Phaser.Display.Masks.BitmapMask(
+//       this,
+//       this.tokenSilverMask
+//     );
+//     // create a group for the gold tab
+//     this.tokenSilverTabGroup = this.add.group();
+//     this.tokenSilverTab = this.add
+//       .sprite(game.config.width - 110, 150, "silver-token-tab")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(99);
+//     this.tokenSilverHand = this.add
+//       .sprite(game.config.width - 130, 150, "hand")
+//       .setScrollFactor(0)
+//       .setScale(0.12)
+//       .setDepth(99);
+//     this.tokenSilverTabGroup.addMultiple([
+//       this.tokenSilverTab,
+//       this.tokenSilverHand,
+//     ]);
+//     // hand animation
+//     this.tweens.add({
+//       targets: this.tokenSilverHand,
+//       x: game.config.width - 125,
+//       duration: 500,
+//       ease: "Back.easeIn ",
+//       yoyo: true,
+//       loop: -1,
+//     });
+//     this.tokenSilverTabGroup.toggleVisible();
 
-    // Gold token type
-    let tokenGold = this.add
-      .sprite(game.config.width - 60, 250, "gold-token-type")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(100);
-    this.tokenGoldBar = this.add
-      .sprite(tokenGold.x, tokenGold.y + 75, "gold-token-overlay")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(100);
-    this.tokenGoldMask = this.add
-      .sprite(tokenGold.x, tokenGold.y, "gold-token-mask")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(100);
-    this.tokenGoldMask.visible = true;
-    this.tokenGoldBar.mask = new Phaser.Display.Masks.BitmapMask(
-      this,
-      this.tokenGoldMask
-    );
-    // create a group for the gold tab
-    this.tokenGoldTabGroup = this.add.group();
-    this.tokenGoldTab = this.add
-      .sprite(game.config.width - 110, 250, "gold-token-tab")
-      .setScrollFactor(0)
-      .setScale(0.2)
-      .setDepth(99);
-    this.tokenGoldHand = this.add
-      .sprite(game.config.width - 130, 250, "hand")
-      .setScrollFactor(0)
-      .setScale(0.12)
-      .setDepth(99);
-    this.tokenGoldTabGroup.addMultiple([this.tokenGoldTab, this.tokenGoldHand]);
-    // hand animation
-    this.tweens.add({
-      targets: this.tokenGoldHand,
-      x: game.config.width - 125,
-      duration: 500,
-      ease: "Back.easeIn ",
-      yoyo: true,
-      loop: -1,
-    });
-    this.tokenGoldTabGroup.toggleVisible();
+//     // Gold token type
+//     let tokenGold = this.add
+//       .sprite(game.config.width - 60, 250, "gold-token-type")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(100);
+//     this.tokenGoldBar = this.add
+//       .sprite(tokenGold.x, tokenGold.y + 75, "gold-token-overlay")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(100);
+//     this.tokenGoldMask = this.add
+//       .sprite(tokenGold.x, tokenGold.y, "gold-token-mask")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(100);
+//     this.tokenGoldMask.visible = true;
+//     this.tokenGoldBar.mask = new Phaser.Display.Masks.BitmapMask(
+//       this,
+//       this.tokenGoldMask
+//     );
+//     // create a group for the gold tab
+//     this.tokenGoldTabGroup = this.add.group();
+//     this.tokenGoldTab = this.add
+//       .sprite(game.config.width - 110, 250, "gold-token-tab")
+//       .setScrollFactor(0)
+//       .setScale(0.2)
+//       .setDepth(99);
+//     this.tokenGoldHand = this.add
+//       .sprite(game.config.width - 130, 250, "hand")
+//       .setScrollFactor(0)
+//       .setScale(0.12)
+//       .setDepth(99);
+//     this.tokenGoldTabGroup.addMultiple([this.tokenGoldTab, this.tokenGoldHand]);
+//     // hand animation
+//     this.tweens.add({
+//       targets: this.tokenGoldHand,
+//       x: game.config.width - 125,
+//       duration: 500,
+//       ease: "Back.easeIn ",
+//       yoyo: true,
+//       loop: -1,
+//     });
+//     this.tokenGoldTabGroup.toggleVisible();
 
     // decide which token is the goal
-    this.getTokenGoal = function () {
-      const random = Phaser.Math.Between(1, 3);
-      switch (random) {
-        case 1:
-          this.tokenGoal = "gold";
-          this.tokenGoldTabGroup.toggleVisible();
-          break;
-        case 2:
-          this.tokenGoal = "silver";
-          this.tokenSilverTabGroup.toggleVisible();
-          break;
-        case 3:
-          this.tokenGoal = "bronze";
-          this.tokenBronzeTabGroup.toggleVisible();
-          break;
-        default:
-          this.tokenGoal = "gold";
-          this.tokenGoldTabGroup.toggleVisible();
-      }
-    };
-    this.getTokenGoal();
-    console.log("token goal is:", this.tokenGoal);
+    // this.getTokenGoal = function () {
+    //   const random = Phaser.Math.Between(1, 3);
+    //   switch (random) {
+    //     case 1:
+    //       this.tokenGoal = "gold";
+    //       this.tokenGoldTabGroup.toggleVisible();
+    //       break;
+    //     case 2:
+    //       this.tokenGoal = "silver";
+    //       this.tokenSilverTabGroup.toggleVisible();
+    //       break;
+    //     case 3:
+    //       this.tokenGoal = "bronze";
+    //       this.tokenBronzeTabGroup.toggleVisible();
+    //       break;
+    //     default:
+    //       this.tokenGoal = "gold";
+    //       this.tokenGoldTabGroup.toggleVisible();
+    //   }
+    // };
+    // this.getTokenGoal();
+    // console.log("token goal is:", this.tokenGoal);
 
     this.platforms = this.physics.add.staticGroup();
 
@@ -739,7 +739,7 @@ class Game extends Phaser.Scene {
       // this.tokenSilverBar.y -= 5
       // console.log("bronze.Y:",this.tokenBronzeBar.y,"Gold.Y:",this.tokenGoldBar.y,"Silver.Y:",this.tokenSilverBar.y,)
 
-      this.sound.play("jump");
+      // this.sound.play("jump");
     }
 
     const vy = this.player.body.velocity.y;
@@ -752,7 +752,7 @@ class Game extends Phaser.Scene {
     const bottomPlatform = this.findBottomMostPlatform();
     if (this.player.y > bottomPlatform.y + 200) {
       this.scene.start("game-over");
-      this.sound.play("die");
+      // this.sound.play("die");
     }
   }
 
@@ -825,7 +825,7 @@ class Game extends Phaser.Scene {
   handleCollectToken(player, token) {
     if (this.lives <= 1) {
       this.scene.start("game-over");
-      this.sound.play("die");
+      // this.sound.play("die");
     }
 
     // remove touched token
@@ -838,7 +838,7 @@ class Game extends Phaser.Scene {
 
     // take action depending on which token touched
     if (tokenGot == this.tokenGoal) {
-      this.sound.play("good");
+      // this.sound.play("good");
       if (this.tokenGoal == "gold") {
         // TODO: increase gold token type
         if (this.tokenGoldBar.y == 250) {
@@ -864,7 +864,7 @@ class Game extends Phaser.Scene {
       }
     } else {
       this.lives--;
-      this.sound.play("hurt");
+      // this.sound.play("hurt");
       this.livesText.setText(`Lives: ${this.lives}`);
     }
   }
@@ -902,7 +902,7 @@ class GameOver extends Phaser.Scene {
       delay: 3000,
     };
     this.endMusic = this.sound.add("end-music", musicConfig);
-    this.endMusic.play();
+    // this.endMusic.play();
 
     const width = this.scale.width;
     const height = this.scale.height;
