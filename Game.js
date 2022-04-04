@@ -66,9 +66,27 @@ class Game extends Phaser.Scene {
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fbg_layer1.png?v=1603605919212"
     );
     this.load.image(
-      "background2",
-      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/41-space-scrolling-background850.jpg?v=1648000578139"
+      "bg1",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1.png?v=1649030866283"
     );
+     this.load.image(
+      "bg2",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg2.png?v=1649030866646"
+    );
+    this.load.image(
+      "bg3",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg3.png?v=1649030867482"
+    );
+    this.load.image(
+      "bg4",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg4.png?v=1649030866382"
+    );
+    this.load.image(
+      "heaven",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/heaven.png?v=1649030866831"
+    );
+
+    
     this.load.image(
       "kowhaiwhai",
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fkowhaiwhai.png?v=1609392792102"
@@ -337,7 +355,11 @@ class Game extends Phaser.Scene {
       },
     });
 
-    this.add.image(240, -1300, "background2");
+    this.add.image(300, -2000, "bg1");
+    this.add.image(300, -2000, "bg2");
+    this.add.image(300, -2000, "bg3");
+    this.add.image(300, -2000, "bg4");
+    this.add.image(300, -2000, "heaven");
     // this.add
     //   .tileSprite(
     //     game.config.width / 2,
