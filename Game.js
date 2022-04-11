@@ -918,21 +918,25 @@ class Game extends Phaser.Scene {
     switch (random) {
       case 1:
         const goldToken = this.tokens.get(sprite.x, y, "gold-coin-1");
+        goldToken.setScale(2)
         goldToken.setActive(true);
         goldToken.setVisible(true);
         this.add.existing(goldToken);
         goldToken.body.setSize(goldToken.width, goldToken.height);
-        goldToken.play("goldCoin", true);
+        // goldToken.play("goldCoin", true);
+        goldToken.play("lightning", true);
         this.physics.world.enable(goldToken);
         return goldToken;
         break;
       case 2:
         const silverToken = this.tokens.get(sprite.x, y, "silver-coin-1");
+        silverToken.setScale(2)
         silverToken.setActive(true);
         silverToken.setVisible(true);
         this.add.existing(silverToken);
         silverToken.body.setSize(silverToken.width, silverToken.height);
-        silverToken.play("silverCoin", true);
+        // silverToken.play("silverCoin", true);
+        silverToken.play("lightning", true);
         this.physics.world.enable(silverToken);
         return silverToken;
         break;
@@ -942,7 +946,8 @@ class Game extends Phaser.Scene {
         bronzeToken.setVisible(true);
         this.add.existing(bronzeToken);
         bronzeToken.body.setSize(bronzeToken.width, bronzeToken.height);
-        bronzeToken.play("bronzeCoin", true);
+        // bronzeToken.play("bronzeCoin", true);
+        bronzeToken.play("lightning", true);
         this.physics.world.enable(bronzeToken);
         return bronzeToken;
         break;
