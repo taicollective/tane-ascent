@@ -65,9 +65,13 @@ class Game extends Phaser.Scene {
       "background",
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fbg_layer1.png?v=1603605919212"
     );
+    // this.load.image(
+    //   "bg1",
+    //   "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1.png?v=1649030866283"
+    // );
     this.load.image(
       "bg1",
-      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1.png?v=1649030866283"
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2.png?v=1649667680599"
     );
      this.load.image(
       "bg2",
@@ -92,6 +96,19 @@ class Game extends Phaser.Scene {
      this.load.image(
       "stars2",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/stars2.png?v=1649669918099"
+    );
+    
+     this.load.image(
+      "planets",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/planets.png?v=1649671820210"
+    );
+     this.load.image(
+      "heavenCloudsFront",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/heavenCloudsFront.png?v=1649671819828"
+    );
+     this.load.image(
+      "heavenCloudsBack",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/heavenCloudsBack.png?v=1649671819866"
     );
 
 
@@ -154,7 +171,6 @@ class Game extends Phaser.Scene {
       "cheer",
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fcheer.wav?v=1609537053752"
     );
-
 
     // TANE !!! (From Ariki Creative)
     this.load.spritesheet('taneIdle',
@@ -242,11 +258,20 @@ class Game extends Phaser.Scene {
       },
     });
 
-    this.add.image(300, -3400, "bg1");
+    // ================= BACKGROUND LAYERS
+    this.backdrop = this.add.image(300, -5000, "bg1");
     this.add.image(300, -3400, "bg2").setScrollFactor(0.8);
-    this.add.image(300, -3400, "bg3").setScrollFactor(0.9);
-    this.add.image(300, -3400, "bg4").setScrollFactor(0.7);
-    this.add.image(300, -3400, "heaven");
+    this.add.image(300, -3600, "bg3").setScrollFactor(0.9);
+    // this.add.image(300, -3400, "bg4").setScrollFactor(0.7);
+    this.add.image(300, -2700, "stars1").setScrollFactor(0.5).setScale(0.6);
+    this.add.image(300, -2800, "stars2").setScrollFactor(0.6).setScale(0.5);
+    this.planets = this.add.image(300, -5300, "planets").setScrollFactor(0.5);
+    this.add.image(350, -4720, "heavenCloudsBack").setScrollFactor(0.48);
+    this.add.image(100, -5100 , "heavenCloudsFront").setScrollFactor(0.52);
+    console.log('this.backdrop',this.backdrop);
+    console.log('this.planets',this.planets);
+
+
     // this.add
     //   .tileSprite(
     //     game.config.width / 2,
@@ -259,190 +284,15 @@ class Game extends Phaser.Scene {
     //   .setAlpha(0.2)
     //   .setScale(1);
 
-    // token types
-    // this.add.image(game.config.width - 60, 50, "bronze-token-type").setScrollFactor(0).setScale(0.2).setDepth(100)
-    // this.add.image(game.config.width - 60, 150, "silver-token-type").setScrollFactor(0).setScale(0.2).setDepth(100)
-    // this.add.image(game.config.width - 60, 250, "gold-token-type").setScrollFactor(0).setScale(0.2).setDepth(100)
-
-    // ========== TOKEN METERS
-    // Bronze token type
-    // the token container. A simple sprite
-//     let tokenBronze = this.add
-//       .sprite(game.config.width - 60, 50, "bronze-token-type")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(100);
-//     // the energy bar. Another simple sprite
-//     this.tokenBronzeBar = this.add
-//       .sprite(tokenBronze.x, tokenBronze.y + 75, "bronze-token-overlay")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(100);
-//     // a copy of the energy bar to be used as a mask. Another simple sprite but...
-//     //energybar width is 500px (at 0.2 scale energybar width is 100px)
-//     this.tokenBronzeMask = this.add
-//       .sprite(tokenBronze.x, tokenBronze.y, "bronze-token-mask")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(100);
-//     this.tokenBronzeMask.visible = true;
-//     // and we assign it as energyBar's mask.
-//     this.tokenBronzeBar.mask = new Phaser.Display.Masks.BitmapMask(
-//       this,
-//       this.tokenBronzeMask
-//     );
-//     // create a group for the gold tab
-//     this.tokenBronzeTabGroup = this.add.group();
-//     this.tokenBronzeTab = this.add
-//       .sprite(game.config.width - 110, 50, "bronze-token-tab")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(99);
-//     this.tokenBronzeHand = this.add
-//       .sprite(game.config.width - 130, 50, "hand")
-//       .setScrollFactor(0)
-//       .setScale(0.12)
-//       .setDepth(99);
-//     this.tokenBronzeTabGroup.addMultiple([
-//       this.tokenBronzeTab,
-//       this.tokenBronzeHand,
-//     ]);
-//     // hand animation
-//     this.tweens.add({
-//       targets: this.tokenBronzeHand,
-//       x: game.config.width - 125,
-//       duration: 500,
-//       ease: "Back.easeIn ",
-//       yoyo: true,
-//       loop: -1,
-//     });
-//     this.tokenBronzeTabGroup.toggleVisible();
-
-//     // Silver token type
-//     let tokenSilver = this.add
-//       .sprite(game.config.width - 60, 150, "silver-token-type")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(100);
-//     this.tokenSilverBar = this.add
-//       .sprite(tokenSilver.x, tokenSilver.y + 75, "silver-token-overlay")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(100);
-//     this.tokenSilverMask = this.add
-//       .sprite(tokenSilver.x, tokenSilver.y, "silver-token-mask")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(100);
-//     this.tokenSilverMask.visible = true;
-//     this.tokenSilverBar.mask = new Phaser.Display.Masks.BitmapMask(
-//       this,
-//       this.tokenSilverMask
-//     );
-//     // create a group for the gold tab
-//     this.tokenSilverTabGroup = this.add.group();
-//     this.tokenSilverTab = this.add
-//       .sprite(game.config.width - 110, 150, "silver-token-tab")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(99);
-//     this.tokenSilverHand = this.add
-//       .sprite(game.config.width - 130, 150, "hand")
-//       .setScrollFactor(0)
-//       .setScale(0.12)
-//       .setDepth(99);
-//     this.tokenSilverTabGroup.addMultiple([
-//       this.tokenSilverTab,
-//       this.tokenSilverHand,
-//     ]);
-//     // hand animation
-//     this.tweens.add({
-//       targets: this.tokenSilverHand,
-//       x: game.config.width - 125,
-//       duration: 500,
-//       ease: "Back.easeIn ",
-//       yoyo: true,
-//       loop: -1,
-//     });
-//     this.tokenSilverTabGroup.toggleVisible();
-
-//     // Gold token type
-//     let tokenGold = this.add
-//       .sprite(game.config.width - 60, 250, "gold-token-type")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(100);
-//     this.tokenGoldBar = this.add
-//       .sprite(tokenGold.x, tokenGold.y + 75, "gold-token-overlay")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(100);
-//     this.tokenGoldMask = this.add
-//       .sprite(tokenGold.x, tokenGold.y, "gold-token-mask")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(100);
-//     this.tokenGoldMask.visible = true;
-//     this.tokenGoldBar.mask = new Phaser.Display.Masks.BitmapMask(
-//       this,
-//       this.tokenGoldMask
-//     );
-//     // create a group for the gold tab
-//     this.tokenGoldTabGroup = this.add.group();
-//     this.tokenGoldTab = this.add
-//       .sprite(game.config.width - 110, 250, "gold-token-tab")
-//       .setScrollFactor(0)
-//       .setScale(0.2)
-//       .setDepth(99);
-//     this.tokenGoldHand = this.add
-//       .sprite(game.config.width - 130, 250, "hand")
-//       .setScrollFactor(0)
-//       .setScale(0.12)
-//       .setDepth(99);
-//     this.tokenGoldTabGroup.addMultiple([this.tokenGoldTab, this.tokenGoldHand]);
-//     // hand animation
-//     this.tweens.add({
-//       targets: this.tokenGoldHand,
-//       x: game.config.width - 125,
-//       duration: 500,
-//       ease: "Back.easeIn ",
-//       yoyo: true,
-//       loop: -1,
-//     });
-//     this.tokenGoldTabGroup.toggleVisible();
-
-    // decide which token is the goal
-    // this.getTokenGoal = function () {
-    //   const random = Phaser.Math.Between(1, 3);
-    //   switch (random) {
-    //     case 1:
-    //       this.tokenGoal = "gold";
-    //       this.tokenGoldTabGroup.toggleVisible();
-    //       break;
-    //     case 2:
-    //       this.tokenGoal = "silver";
-    //       this.tokenSilverTabGroup.toggleVisible();
-    //       break;
-    //     case 3:
-    //       this.tokenGoal = "bronze";
-    //       this.tokenBronzeTabGroup.toggleVisible();
-    //       break;
-    //     default:
-    //       this.tokenGoal = "gold";
-    //       this.tokenGoldTabGroup.toggleVisible();
-    //   }
-    // };
-    // this.getTokenGoal();
-    // console.log("token goal is:", this.tokenGoal);
-
     this.platforms = this.physics.add.staticGroup();
 
     let firstPlatform = true;
 
     // then create 5 platforms from the group
     for (let i = 0; i < 5; ++i) {
-      let x = Phaser.Math.Between(80, 400);
-      const y = 150 * i;
+      let x = Phaser.Math.Between(80, 400); //320
+      const y = 154 * i;
+      // const y = -5500 + (Phaser.Math.Between(160, 170 ) * i);
 
       // make sure first platform is below tane
       if (i == 4 && firstPlatform == true) {
@@ -460,9 +310,17 @@ class Game extends Phaser.Scene {
       body.updateFromGameObject();
     }
 
+    // this.cameras.main.scrollY = -8000
+    // this.cameras.main.scrollY = -9500
+    // this.cameras.main.scrollY = -5500
+
     this.player = this.physics.add
       .sprite(240, 320, "taneIdle")
+
+    // this.player = this.physics.add
+    //   .sprite(240, -5500, "taneIdle")
       // .setScale(0.08);
+
 
     this.player.body.setSize(30, 50).setOffset(50, 50);
     // .setSize(50, 1500).setOffset(850, 100);
@@ -480,8 +338,10 @@ class Game extends Phaser.Scene {
     // this.cameras.main.startFollow(this.player);
     this.cameras.main.setDeadzone(this.scale.width * 1.5);
 
-    this.tokens = this.physics.add.group({
-      classType: Carrot,
+    this.orbs = this.physics.add.group({
+      classType: Orb,
+      allowGravity: false,
+      immovable: true
     });
 
     //================ Animations
@@ -582,23 +442,26 @@ class Game extends Phaser.Scene {
       key: 'blueOrb',
       frames: 'blueOrb',
       frameRate: 30,
+      repeat: -1,
     });
     this.anims.create({
       key: 'pinkOrb',
       frames: 'pinkOrb',
       frameRate: 60,
+      repeat: -1
     });
     this.anims.create({
       key: 'lightning',
       frames: 'lightning',
       frameRate: 15,
+      repeat: -1 
     });
 
-    this.physics.add.collider(this.platforms, this.tokens);
+    this.physics.add.collider(this.platforms, this.orbs);
     this.physics.add.overlap(
       this.player,
-      this.tokens,
-      this.handleCollectToken,
+      this.orbs,
+      this.handleCollectOrb,
       undefined,
       this
     );
@@ -643,23 +506,27 @@ class Game extends Phaser.Scene {
     if (!this.player) {
       return;
     }
-
+    
+  
     // camera moving  up    
-    this.cameras.main.scrollY -= 1.5
+    if (this.cameras.main.scrollY > -11000) {
+      this.cameras.main.scrollY -= 1.5 
+     }
 
+    // update platforms 
     this.platforms.children.iterate((child) => {
       /** @type {Phaser.Physics.Arcade.Sprite} */
       const platform = child;
 
       // add new platforms above once platforms disappear below bottom line.
       const scrollY = this.cameras.main.scrollY;
-      // console.log('scrollY',scrollY);
+      console.log('scrollY',scrollY,"player xy:",this.player.x," ",this.player.y);
       if (platform.y >= scrollY + 750) {
         // if platform is 750 below current scrollY
-        platform.y = scrollY - Phaser.Math.Between(50, 100); // random new y position relative to scrollY
+        platform.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
         platform.x = Phaser.Math.Between(0, game.config.width); // random new x position
         platform.body.updateFromGameObject(); // update position
-        this.addCarrotAbove(platform); // add carrot/token
+       // this.addOrbAbove(platform); // add Orb/token
       }
     });
 
@@ -756,104 +623,102 @@ class Game extends Phaser.Scene {
    *
    * @param {Phaser.GameObjects.Sprite} sprite
    */
-  addCarrotAbove(sprite) {
-    // set token y position
-    // const y = sprite.y - sprite.displayHeight;
-    const y = sprite.y;
-    // get random number to determine which token to randomly place
-    const random = Phaser.Math.Between(1, 3);
 
-    switch (random) {
-      case 1:
-        const goldToken = this.tokens.get(sprite.x, y, "gold-coin-1");
-        goldToken.setScale(2)
-        goldToken.setActive(true);
-        goldToken.setVisible(true);
-        this.add.existing(goldToken);
-        goldToken.body.setSize(goldToken.width, goldToken.height);
-        // goldToken.play("goldCoin", true);
-        goldToken.play("lightning", true);
-        this.physics.world.enable(goldToken);
-        return goldToken;
-        break;
-      case 2:
-        const silverToken = this.tokens.get(sprite.x, y, "silver-coin-1");
-        silverToken.setScale(2)
-        silverToken.setActive(true);
-        silverToken.setVisible(true);
-        this.add.existing(silverToken);
-        silverToken.body.setSize(silverToken.width, silverToken.height);
-        // silverToken.play("silverCoin", true);
-        silverToken.play("lightning", true);
-        this.physics.world.enable(silverToken);
-        return silverToken;
-        break;
-      case 3:
-        const bronzeToken = this.tokens.get(sprite.x, y, "bronze-coin-1");
-        bronzeToken.setActive(true);
-        bronzeToken.setVisible(true);
-        this.add.existing(bronzeToken);
-        bronzeToken.body.setSize(bronzeToken.width, bronzeToken.height);
-        // bronzeToken.play("bronzeCoin", true);
-        bronzeToken.play("lightning", true);
-        this.physics.world.enable(bronzeToken);
-        return bronzeToken;
-        break;
-      default:
-        return;
-    }
-  }
+  // addOrbAbove(sprite) {
+  //   // set token y position
+  //   // const y = sprite.y - sprite.displayHeight;
+  //   const y = sprite.y;
+  //   // get random number to determine which token to randomly place
+  //   const random = Phaser.Math.Between(1, 2);
+
+  //   switch (random) {
+  //     case 1:
+  //       const blueOrb = this.orbs.get(sprite.x, y, "blueOrb");
+  //       blueOrb.setScale(2)
+  //       blueOrb.setActive(true);
+  //       blueOrb.setVisible(true);
+  //       this.add.existing(blueOrb);
+  //       blueOrb.body.setSize(blueOrb.width, blueOrb.height);
+  //       // blueOrb.play("goldCoin", true);
+  //       blueOrb.play("blueOrb", true);
+  //       // this.physics.world.enable(blueOrb);
+  //       return blueOrb;
+  //       break;
+  //     case 2:
+  //       const pinkOrb = this.orbs.get(sprite.x, y, "pinkOrb");
+  //       pinkOrb.setScale(2)
+  //       pinkOrb.setActive(true);
+  //       pinkOrb.setVisible(true);
+  //       this.add.existing(pinkOrb);
+  //       pinkOrb.body.setSize(pinkOrb.width, pinkOrb.height);
+  //       // pinkOrb.play("silverCoin", true);
+  //       pinkOrb.play("pinkOrb", true);
+  //       // this.physics.world.enable(pinkOrb);
+  //       return pinkOrb;
+  //       break;
+  //     default:
+  //       return;
+  //   }
+  // }
 
   /**
    *
    * @param {Phaser.Physics.Arcade.Sprite} player
-   * @param {Carrot} carrot
+   * @param {Orb} orb
    */
-  handleCollectToken(player, token) {
-    if (this.lives <= 1) {
+  handleLightningStrike() {
+    console.log('you got zapped!');
+     if (this.lives <= 1) {
       this.scene.start("game-over");
       // this.sound.play("die");
     }
+  }
+
+  handleCollectOrb(player, orb) {
+    // if (this.lives <= 1) {
+    //   this.scene.start("game-over");
+    //   // this.sound.play("die");
+    // }
 
     // remove touched token
-    this.tokens.killAndHide(token);
-    this.physics.world.disableBody(token.body);
+    this.orbs.killAndHide(orb);
+    this.physics.world.disableBody(orb.body);
 
-    // get token type
-    const tokenGot = token.texture.key.split("-")[0];
-    console.log("target:", this.tokenGoal, "got:", tokenGot);
+    // get orb type
+    const orbGot = orb.texture.key.split("-")[0];
+    console.log("target:", this.orbGoal, "got:", orbGot);
 
-    // take action depending on which token touched
-    if (tokenGot == this.tokenGoal) {
-      // this.sound.play("good");
-      if (this.tokenGoal == "gold") {
-        // TODO: increase gold token type
-        if (this.tokenGoldBar.y == 250) {
-          console.log("YOU WIN");
-          this.scene.start("you-win");
-        } else {
-          this.tokenGoldBar.y -= 5;
-        }
-      } else if (this.tokenGoal == "silver") {
-        if (this.tokenSilverBar.y == 150) {
-          console.log("YOU WIN");
-          this.scene.start("you-win");
-        } else {
-          this.tokenSilverBar.y -= 5;
-        }
-      } else if (this.tokenGoal == "bronze") {
-        if (this.tokenBronzeBar.y == 50) {
-          console.log("YOU WIN");
-          this.scene.start("you-win");
-        } else {
-          this.tokenBronzeBar.y -= 5;
-        }
-      }
-    } else {
-      this.lives--;
-      // this.sound.play("hurt");
-      this.livesText.setText(`Lives: ${this.lives}`);
-    }
+    // // take action depending on which orb touched
+    // if (orbGot == this.orbGoal) {
+    //   // this.sound.play("good");
+    //   if (this.orbGoal == "gold") {
+    //     // TODO: increase gold orb type
+    //     if (this.orbGoldBar.y == 250) {
+    //       console.log("YOU WIN");
+    //       this.scene.start("you-win");
+    //     } else {
+    //       this.orbGoldBar.y -= 5;
+    //     }
+    //   } else if (this.orbGoal == "silver") {
+    //     if (this.orbsilverBar.y == 150) {
+    //       console.log("YOU WIN");
+    //       this.scene.start("you-win");
+    //     } else {
+    //       this.orbsilverBar.y -= 5;
+    //     }
+    //   } else if (this.orbGoal == "bronze") {
+    //     if (this.orbBronzeBar.y == 50) {
+    //       console.log("YOU WIN");
+    //       this.scene.start("you-win");
+    //     } else {
+    //       this.orbBronzeBar.y -= 5;
+    //     }
+    //   } 
+    // } else {
+    //   this.lives--;
+    //   // this.sound.play("hurt");
+    //   this.livesText.setText(`Lives: ${this.lives}`);
+    // }
   }
 
   findBottomMostPlatform() {
@@ -1050,14 +915,14 @@ class YouWin extends Phaser.Scene {
   }
 }
 
-class Carrot extends Phaser.Physics.Arcade.Sprite {
+class Orb extends Phaser.Physics.Arcade.Sprite {
   /**
    * @param {Phaser.Scene} scene
    * @param {number} x
    * @param {number} y
    * @param {string} texture
    */
-  constructor(scene, x, y, texture = "carrot") {
+  constructor(scene, x, y, texture = "orb") {
     super(scene, x, y, texture);
 
     this.setScale(0.5);
