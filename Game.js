@@ -510,7 +510,7 @@ class Game extends Phaser.Scene {
   
     // camera moving  up    
     if (this.cameras.main.scrollY > -11000) {
-      this.cameras.main.scrollY -= 1.5 
+      this.cameras.main.scrollY -= 1.5
      }
 
     // update platforms 
