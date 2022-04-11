@@ -308,6 +308,45 @@ class Game extends Phaser.Scene {
       "https://cdn.glitch.com/ac36cc02-7b80-46b7-9cad-fe737d8b49ab%2Fsilver_coin_round_diamond_6.png"
     );
 
+    // TANE !!! (From Ariki Creative)
+    this.load.spritesheet('taneIdle',
+      'https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-idle.png?v=1606611069685', {
+        frameWidth: 128,
+        frameHeight: 128
+      }
+    );
+
+    this.load.spritesheet('taneJump',
+      'https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-jump.png?v=1606611070167', {
+        frameWidth: 128,
+        frameHeight: 128
+      }
+    );
+    this.load.spritesheet('taneRun',
+      'https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-run.png?v=1606611070188', {
+        frameWidth: 128,
+        frameHeight: 128
+      }
+    );
+    this.load.spritesheet('blueOrb',
+      'https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/blue-orb-spritesheet.png?v=1649574549090', {
+        frameWidth: 32,
+        frameHeight: 32
+      }
+    );
+    this.load.spritesheet('pinkOrb',
+      'https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/pink-orb-spritesheet.png?v=1649574533210', {
+        frameWidth: 32,
+        frameHeight: 32
+      }
+    );
+    this.load.spritesheet('lightning',
+      'https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/lightning-spritesheet.png?v=1649576960834', {
+        frameWidth: 112,
+        frameHeight: 112
+      }
+    );
+
     this.cursors = this.input.keyboard.createCursorKeys();
 
     //  Load the Google WebFont Loader script
@@ -574,10 +613,11 @@ class Game extends Phaser.Scene {
     }
 
     this.player = this.physics.add
-      .sprite(240, 320, "tane-stand")
-      .setScale(0.08);
+      .sprite(240, 320, "taneIdle")
+      // .setScale(0.08);
 
-    this.player.body.setSize(50, 1500).setOffset(850, 100);
+    this.player.body.setSize(30, 50).setOffset(50, 50);
+    // .setSize(50, 1500).setOffset(850, 100);
 
     this.physics.add.collider(this.platforms, this.player);
 
@@ -589,7 +629,7 @@ class Game extends Phaser.Scene {
     this.player.body.checkCollision.left = false;
     this.player.body.checkCollision.right = false;
 
-    this.cameras.main.startFollow(this.player);
+    // this.cameras.main.startFollow(this.player);
     this.cameras.main.setDeadzone(this.scale.width * 1.5);
 
     this.tokens = this.physics.add.group({
@@ -666,6 +706,46 @@ class Game extends Phaser.Scene {
       repeat: -1,
     });
 
+    this.anims.create({
+      key: 'taneRun',
+      frames: this.anims.generateFrameNumbers('taneRun', {
+        frames: [16, 17, 18, 19, 20, 21, 22, 23]
+      }),
+      frameRate: 15,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'taneIdle',
+      frames: this.anims.generateFrameNumbers('taneIdle', {
+        frames: [0, 1, 2]
+      }),
+      frameRate: 5,
+    });
+
+    this.anims.create({
+      key: 'taneJump',
+      frames: this.anims.generateFrameNumbers('taneJump', {
+        frames: [12, 13, 14, 15]
+      }),
+      frameRate: 10,
+    });
+    this.anims.create({
+      key: 'blueOrb',
+      frames: 'blueOrb',
+      frameRate: 30,
+    });
+    this.anims.create({
+      key: 'pinkOrb',
+      frames: 'pinkOrb',
+      frameRate: 60,
+    });
+    this.anims.create({
+      key: 'lightning',
+      frames: 'lightning',
+      frameRate: 15,
+    });
+
     this.physics.add.collider(this.platforms, this.tokens);
     this.physics.add.overlap(
       this.player,
@@ -677,14 +757,14 @@ class Game extends Phaser.Scene {
 
     // ========= CONTROLS ===========
     // input listener to move the hero
-    this.input.on("pointerdown", this.moveHero, this);
+    // this.input.on("pointerdown", this.moveHero, this);
     // input listener on keyboard to move the hero
-    this.input.keyboard.on("keydown", this.moveHero, this);
+    // this.input.keyboard.on("keydown", this.moveHero, this);
 
     // input listener to stop the hero
-    this.input.on("pointerup", this.stopHero, this);
+    // this.input.on("pointerup", this.stopHero, this);
     // input listener on keyboard to stop the hero
-    this.input.keyboard.on("keyup", this.stopHero, this);
+    // this.input.keyboard.on("keyup", this.stopHero, this);
   }
 
   moveHero(e) {
@@ -696,8 +776,12 @@ class Game extends Phaser.Scene {
     // keyboard controller
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-300);
+      this.player.play("taneRun")
     } else if (this.cursors.right.isDown) {
       this.player.setVelocityX(300);
+      this.player.play("taneRun")
+    } else {
+      this.player.play("taneIdle",true)
     }
   }
 
@@ -712,12 +796,16 @@ class Game extends Phaser.Scene {
       return;
     }
 
+    // camera moving  up    
+    this.cameras.main.scrollY -= 1.5
+
     this.platforms.children.iterate((child) => {
       /** @type {Phaser.Physics.Arcade.Sprite} */
       const platform = child;
 
       // add new platforms above once platforms disappear below bottom line.
       const scrollY = this.cameras.main.scrollY;
+      // console.log('scrollY',scrollY);
       if (platform.y >= scrollY + 750) {
         // if platform is 750 below current scrollY
         platform.y = scrollY - Phaser.Math.Between(50, 100); // random new y position relative to scrollY
@@ -729,23 +817,69 @@ class Game extends Phaser.Scene {
 
     const touchingDown = this.player.body.touching.down;
 
-    if (touchingDown) {
-      this.player.setVelocityY(-610);
-      this.player.setTexture("tane-jump");
+    if (touchingDown) {}
 
-      // testing token meters
-      // this.tokenBronzeBar.y -= 5
-      // this.tokenGoldBar.y -= 5
-      // this.tokenSilverBar.y -= 5
-      // console.log("bronze.Y:",this.tokenBronzeBar.y,"Gold.Y:",this.tokenGoldBar.y,"Silver.Y:",this.tokenSilverBar.y,)
-
-      // this.sound.play("jump");
+    const playerJump = -310
+    const playerVelocity = 300
+    
+    // Control the player with left or right keys
+    if (this.cursors.left.isDown) {
+      this.player.setVelocityX(-playerVelocity);
+      if (this.player.body.onFloor()) {
+        this.player.play('taneRun', true);
+      }
+    } else if (this.cursors.right.isDown) {
+      this.player.setVelocityX(playerVelocity);
+      if (this.player.body.onFloor()) {
+        this.player.play('taneRun', true);
+      }
+    } else {
+      // If no keys are pressed, the player keeps still
+      this.player.setVelocityX(0);
+      // Only show the idle animation if the player is footed
+      // If this is not included, the player would look idle while jumping
+      if (this.player.body.onFloor()) {
+        this.player.play('taneIdle', true);
+      }
     }
 
-    const vy = this.player.body.velocity.y;
-    if (vy > 0 && this.player.texture.key !== "tane-stand") {
-      this.player.setTexture("tane-stand");
+    // Player can jump while walking any direction by pressing the space bar
+    // or the 'UP' arrow
+    // === JUMP
+    // if ((this.cursors.space.isDown || this.cursors.up.isDown ) && this.player.body.onFloor() ) {
+    //   this.player.setVelocityY(-350);
+    //   this.player.play('jump', true);
+    // }
+    if (this.cursors.space.isDown && this.player.body.onFloor()) {
+      //player is on the ground, so he is allowed to start a jump
+      this.jumptimer = 1;
+      this.player.body.velocity.y = playerJump;
+      this.player.play('taneJump', false);
+      // this.sound.play("jump"); 
+    } else if (this.cursors.space.isDown && (this.jumptimer != 0)) {
+      //player is no longer on the ground, but is still holding the jump key
+      if (this.jumptimer > 30) { // player has been holding jump for over 30 frames, it's time to stop him
+        this.jumptimer = 0;
+        // this.player.play('taneJump', false);
+      } else { // player is allowed to jump higher (not yet 30 frames of jumping)
+        this.jumptimer++;
+        this.player.body.velocity.y = playerJump;
+        // this.player.play('taneJump', false);
+      }
+    } else if (this.jumptimer != 0) { //reset this.jumptimer since the player is no longer holding the jump key
+      this.jumptimer = 0;
+      // this.player.play('taneJump', false);
     }
+
+       // flip player
+       if (this.player.body.velocity.x > 0) {
+        this.player.setFlipX(true);
+      } else if (this.player.body.velocity.x < 0) {
+        // otherwise, make them face the other side
+        this.player.setFlipX(false);
+      }
+
+
 
     this.horizontalWrap(this.player);
 
@@ -973,7 +1107,7 @@ class YouWin extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setBackgroundColor("#533d8e");
+    this.camera.main.setBackgroundColor("#533d8e");
 
     this.sound.stopAll();
     // load song
