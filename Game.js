@@ -85,6 +85,15 @@ class Game extends Phaser.Scene {
       "heaven",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/heaven.png?v=1649030866831"
     );
+    this.load.image(
+      "stars1",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/stars1.png?v=1649669917739"
+    );
+     this.load.image(
+      "stars2",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/stars2.png?v=1649669918099"
+    );
+
 
     
     this.load.image(
