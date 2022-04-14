@@ -59,8 +59,9 @@ class Game extends Phaser.Scene {
     this.lives = 3;
     this.dreamCount = 0;
     this.tokenGoal = "";
-    this.platformsFinished = false
-    this.deathBy=""
+    this.platformsFinished = false;
+    this.gameFinished = false;
+    this.deathBy = "";
   }
 
   preload() {
@@ -76,7 +77,7 @@ class Game extends Phaser.Scene {
       "bg1",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2.png?v=1649667680599"
     );
-     this.load.image(
+    this.load.image(
       "bg2",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg2.png?v=1649030866646"
     );
@@ -96,42 +97,40 @@ class Game extends Phaser.Scene {
       "stars1",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/stars1.png?v=1649669917739"
     );
-     this.load.image(
+    this.load.image(
       "stars2",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/stars2.png?v=1649669918099"
     );
-    
-     this.load.image(
+
+    this.load.image(
       "planets",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/planets.png?v=1649671820210"
     );
-     this.load.image(
+    this.load.image(
       "heavenCloudsFront",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/heavenCloudsFront.png?v=1649671819828"
     );
-     this.load.image(
+    this.load.image(
       "heavenCloudsBack",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/heavenCloudsBack.png?v=1649671819866"
     );
-     this.load.image(
+    this.load.image(
       "cloud1",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/cloud1.png?v=1649822287079"
     );
-     this.load.image(
+    this.load.image(
       "cloud2",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/cloud2.png?v=1649822287079"
     );
-     this.load.image(
+    this.load.image(
       "cloud3",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/cloud3.png?v=1649822287079"
     );
-     this.load.image(
+    this.load.image(
       "cloud4",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/cloud4.png?v=1649822287079"
     );
 
-
-    
     this.load.image(
       "kowhaiwhai",
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fkowhaiwhai.png?v=1609392792102"
@@ -256,43 +255,99 @@ class Game extends Phaser.Scene {
       "moaMusic",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Moa-Hunting-Tai-Collective.mp3?v=1649892321064"
     );
+    this.load.audio(
+      "fireworksSound",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/fireworks.wav?v=1649910586351"
+    );
 
     // TANE !!! (From Ariki Creative)
-    this.load.spritesheet('taneIdle',
-      'https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-idle.png?v=1606611069685', {
+    this.load.spritesheet(
+      "taneIdle",
+      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-idle.png?v=1606611069685",
+      {
         frameWidth: 128,
-        frameHeight: 128
+        frameHeight: 128,
       }
     );
 
-    this.load.spritesheet('taneJump',
-      'https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-jump.png?v=1606611070167', {
+    this.load.spritesheet(
+      "taneJump",
+      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-jump.png?v=1606611070167",
+      {
         frameWidth: 128,
-        frameHeight: 128
+        frameHeight: 128,
       }
     );
-    this.load.spritesheet('taneRun',
-      'https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-run.png?v=1606611070188', {
+    this.load.spritesheet(
+      "taneRun",
+      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Ftane-run.png?v=1606611070188",
+      {
         frameWidth: 128,
-        frameHeight: 128
+        frameHeight: 128,
       }
     );
-    this.load.spritesheet('blueOrb',
-      'https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/blue-orb-spritesheet.png?v=1649574549090', {
+    this.load.spritesheet(
+      "blueOrb",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/blue-orb-spritesheet.png?v=1649574549090",
+      {
         frameWidth: 32,
-        frameHeight: 32
+        frameHeight: 32,
       }
     );
-    this.load.spritesheet('pinkOrb',
-      'https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/pink-orb-spritesheet.png?v=1649574533210', {
+    this.load.spritesheet(
+      "pinkOrb",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/pink-orb-spritesheet.png?v=1649574533210",
+      {
         frameWidth: 32,
-        frameHeight: 32
+        frameHeight: 32,
       }
     );
-    this.load.spritesheet('lightning',
-      'https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/lightning-spritesheet.png?v=1649576960834', {
+    this.load.spritesheet(
+      "lightning",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/lightning-spritesheet.png?v=1649576960834",
+      {
         frameWidth: 112,
-        frameHeight: 112
+        frameHeight: 112,
+      }
+    );
+    this.load.spritesheet(
+      "hiwa",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/hiwa-spritesheet.png?v=1649903657410",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    );
+    this.load.spritesheet(
+      "hiwa2",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/hiwa-spritesheet-2.png?v=1649905580963",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    );
+    this.load.spritesheet(
+      "fireworksBlue",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Explosion_Crystals_Blue-sheet.png?v=1649907669760",
+      {
+        frameWidth: 88,
+        frameHeight: 86,
+      }
+    );
+    this.load.spritesheet(
+      "fireworksBlue2",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Explosion_Long_Blue-sheet.png?v=1649907851908",
+      {
+        frameWidth: 80,
+        frameHeight: 93,
+      }
+    );
+    this.load.spritesheet(
+      "fireworksRocket",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Rocket_Blue.png-sheet.png?v=1649908638368",
+      {
+        frameWidth: 7,
+        frameHeight: 52,
       }
     );
 
@@ -342,6 +397,7 @@ class Game extends Phaser.Scene {
         this.livesText.setAlign("right");
         this.livesText.setOrigin();
         this.livesText.setScrollFactor(0);
+        this.livesText.setDepth(1005);
       },
     });
     // Orbs (text)
@@ -360,6 +416,7 @@ class Game extends Phaser.Scene {
         this.dreamsText.setAlign("center");
         this.dreamsText.setOrigin();
         this.dreamsText.setScrollFactor(0);
+        this.dreamsText.setDepth(1005);
       },
     });
 
@@ -372,9 +429,13 @@ class Game extends Phaser.Scene {
     this.add.image(300, -2800, "stars2").setScrollFactor(0.6).setScale(0.5);
     this.planets = this.add.image(300, -5300, "planets").setScrollFactor(0.5);
     this.add.image(350, -4720, "heavenCloudsBack").setScrollFactor(0.48);
-    this.add.image(100, -5100 , "heavenCloudsFront").setScrollFactor(0.52);
-    console.log('this.backdrop',this.backdrop);
-    console.log('this.planets',this.planets);
+    this.add
+      .image(100, -5100, "heavenCloudsFront")
+      .setScrollFactor(0.52)
+      .setDepth(1002);
+
+    console.log("this.backdrop", this.backdrop);
+    console.log("this.planets", this.planets);
 
     // this.add
     //   .tileSprite(
@@ -390,7 +451,7 @@ class Game extends Phaser.Scene {
 
     // ================= PLATFORMS =================
     this.platforms = this.physics.add.staticGroup();
-    this.clouds = this.physics.add.staticGroup()
+    this.clouds = this.physics.add.staticGroup();
     // this.clouds = this.physics.add.group({
     //   allowGravity: false,
     //   immovable: true
@@ -403,7 +464,7 @@ class Game extends Phaser.Scene {
     for (let i = 0; i < 5; ++i) {
       let x = Phaser.Math.Between(80, 400); //320
       const y = 154 * i;
-      // const y = -5500 + (Phaser.Math.Between(160, 170 ) * i);
+      // const y = -10100 + Phaser.Math.Between(160, 170) * i;
 
       // make sure first platform is below tane
       if (i == 4 && firstPlatform == true) {
@@ -415,6 +476,7 @@ class Game extends Phaser.Scene {
       /** @type {Phaser.Physics.Arcade.Sprite} */
       const platform = this.platforms.create(x, y, "platform");
       platform.scale = 0.2;
+      platform.setDepth(1004);
 
       /** @type {Phaser.Physics.Arcade.StaticBody} */
       const body = platform.body;
@@ -422,35 +484,35 @@ class Game extends Phaser.Scene {
     }
     // ================== CLOUDS ==================
     for (let i = 0; i < 5; ++i) {
-      const cloudNames = ["cloud1","cloud2","cloud3","cloud4"]
+      const cloudNames = ["cloud1", "cloud2", "cloud3", "cloud4"];
       let x = Phaser.Math.Between(80, 400); //320
       let rand = Phaser.Math.Between(0, 3); //320
       const y = -4000 + ( 154 * i);
-      // const y = -5500 + (Phaser.Math.Between(160, 170 ) * i);
+      // const y = -10100 + Phaser.Math.Between(160, 170) * i;
 
       /** @type {Phaser.Physics.Arcade.Sprite} */
       const cloud = this.clouds.create(x, y, cloudNames[rand]);
       cloud.scale = 0.3;
-      cloud.body.setSize(cloud.width, 10).setOffset(0,cloud.height)
-      cloud.setDepth(1000)
+      cloud.body.setSize(cloud.width, 10).setOffset(0, cloud.height);
+      cloud.setDepth(1004);
       /** @type {Phaser.Physics.Arcade.StaticBody} */
       const body = cloud.body;
       body.updateFromGameObject();
     }
 
     // this.cameras.main.scrollY = -8000
-    // this.cameras.main.scrollY = -9500
+    // this.cameras.main.scrollY = -10100;
     // this.cameras.main.scrollY = -5500
 
     // ================= PLAYER =================
     this.player = this.physics.add
       .sprite(240, 320, "taneIdle")
 
-    // this.player = this.physics.add
-    //   .sprite(240, -5500, "taneIdle")
-      // .setScale(0.08);
+    // this.player = this.physics.add.sprite(240, -10100, "taneIdle");
 
+    this.player.setDepth(1003);
     this.player.body.setSize(30, 70).setOffset(50, 30);
+
     this.physics.add.collider(this.platforms, this.player);
     this.physics.add.collider(this.clouds, this.player);
 
@@ -532,71 +594,110 @@ class Game extends Phaser.Scene {
     });
 
     this.anims.create({
-      key: 'taneRun',
-      frames: this.anims.generateFrameNumbers('taneRun', {
-        frames: [16, 17, 18, 19, 20, 21, 22, 23]
+      key: "taneRun",
+      frames: this.anims.generateFrameNumbers("taneRun", {
+        frames: [16, 17, 18, 19, 20, 21, 22, 23],
       }),
       frameRate: 15,
-      repeat: -1
+      repeat: -1,
     });
 
     this.anims.create({
-      key: 'taneIdle',
-      frames: this.anims.generateFrameNumbers('taneIdle', {
-        frames: [0, 1, 2]
+      key: "taneIdle",
+      frames: this.anims.generateFrameNumbers("taneIdle", {
+        frames: [0, 1, 2],
       }),
       frameRate: 5,
     });
 
     this.anims.create({
-      key: 'taneJump',
-      frames: this.anims.generateFrameNumbers('taneJump', {
-        frames: [12, 13, 14, 15]
+      key: "taneJump",
+      frames: this.anims.generateFrameNumbers("taneJump", {
+        frames: [12, 13, 14, 15],
       }),
       frameRate: 10,
     });
     this.anims.create({
-      key: 'blueOrb',
-      frames: 'blueOrb',
+      key: "blueOrb",
+      frames: "blueOrb",
       frameRate: 60,
       repeat: -1,
     });
     this.anims.create({
-      key: 'pinkOrb',
-      frames: 'pinkOrb',
+      key: "pinkOrb",
+      frames: "pinkOrb",
       frameRate: 60,
-      repeat: -1
+      repeat: -1,
     });
     this.anims.create({
-      key: 'lightning',
-      frames: 'lightning',
+      key: "lightning",
+      frames: "lightning",
       frameRate: 15,
-      repeat: -1 
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "hiwa",
+      frames: "hiwa",
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "hiwa2",
+      frames: "hiwa2",
+      frameRate: 5,
+      repeat: -1,
     });
 
-        // ================= GROUPS =================
-        this.orbs = this.physics.add.group({
-          classType: Orb,
-          allowGravity: false,
-          immovable: true
-        });
-        this.lightning = this.physics.add.group({
-          classType: Orb,
-          allowGravity: true,
-          immovable: false
-        });
-    
-        // ================= DREAM ORBS =================
-        // create orbs
-        for(var x = 0; x < 10; x++) {
-          this.addOrb("blue")
-        }
-        for(var x = 0; x < 10; x++) {
-          this.addOrb("pink")
-        }
+    this.anims.create({
+      key: "fireworksBlue",
+      frames: "fireworksBlue",
+      frameRate: 30,
+    });
+    this.anims.create({
+      key: "fireworksBlue2",
+      frames: "fireworksBlue2",
+      frameRate: 30,
+    });
+    this.anims.create({
+      key: "fireworksRocket",
+      frames: "fireworksRocket",
+      frameRate: 30,
+      repeat: -1,
+    });
+    // ================= hiwa =================
+    //
+    this.hiwa = this.physics.add
+      .sprite(300, -4990, "hiwa")
+      .setScrollFactor(0.5)
+      .setScale(1)
+      .setDepth(1001);
+    this.hiwa.immovable = true;
+    this.hiwa.body.moves = false;
+    this.hiwa.allowGravity = false;
+    this.hiwa.play("hiwa2");
 
-        
-// ================= OVERLAPS =================
+    // ================= GROUPS =================
+    this.orbs = this.physics.add.group({
+      classType: Orb,
+      allowGravity: false,
+      immovable: true,
+    });
+    this.lightning = this.physics.add.group({
+      classType: Orb,
+      allowGravity: true,
+      immovable: false,
+    });
+
+    // ================= DREAM ORBS =================
+    // create orbs
+    for (var x = 0; x < 10; x++) {
+      this.addOrb("blue");
+    }
+    for (var x = 0; x < 10; x++) {
+      this.addOrb("pink");
+    }
+
+    // ================= OVERLAPS =================
     // this.physics.add.collider(this.platforms, this.orbs);
     this.physics.add.overlap(
       this.player,
@@ -612,57 +713,79 @@ class Game extends Phaser.Scene {
       undefined,
       this
     );
-
   } // End of create()
 
   update(t, dt) {
     if (!this.player) {
       return;
     }
-    
-  // rotate orbs
-  // this.orbs.children.iterate((orb) => {
-  //   console.log("orb",orb.x,orb.y)
-  //   Phaser.Actions.RotateAround(orb, {x: orb.x, y: orb.y }, 0.02);
-  // })
-  // Phaser.Actions.RotateAroundDistance(this.orbs.getChildren(), {   x: 250, y: -400 }, 0.02, 50);
 
-    // camera moving  up    
+    // rotate orbs
+    // this.orbs.children.iterate((orb) => {
+    //   console.log("orb",orb.x,orb.y)
+    //   Phaser.Actions.RotateAround(orb, {x: orb.x, y: orb.y }, 0.02);
+    // })
+    // Phaser.Actions.RotateAroundDistance(this.orbs.getChildren(), {   x: 250, y: -400 }, 0.02, 50);
+
+    // camera moving  up
     if (this.cameras.main.scrollY > -11000) {
-      this.cameras.main.scrollY -= 1.5
-     }
+      this.cameras.main.scrollY -= 1.5;
+    } else if (
+      this.cameras.main.scrollY <= -11000 &&
+      this.gameFinished == false
+    ) {
+      // ============= GAME FINISHED ==============
+      this.gameFinished = true;
+      console.log("game finished");
+
+      this.sound.play("cheer")
+
+      this.launchFireworks();
+      for (var i = 1; i < 10; i++) {
+        this.time.addEvent({
+          delay: i * 1000,
+          callback: this.launchFireworks,
+          callbackScope: this,
+        });
+      }
+
+      // this.time.addEvent({delay:2000, callback:this.launchFireworks,callbackScope:this});
+      // this.time.addEvent({delay:3000, callback:this.launchFireworks,callbackScope:this});
+      // this.time.addEvent({delay:4000, callback:this.launchFireworks,callbackScope:this});
+      // this.time.addEvent({delay:5000, callback:this.launchFireworks,callbackScope:this});
+    }
 
     const scrollY = this.cameras.main.scrollY;
-    
+
     // ============= UPDATE PLATFORMS ==============
     // stop placing platforms from -500 scrollY
-    if(scrollY < -3500 && this.platformsFinished == false) {
-      this.platformsFinished=true
+    if (scrollY < -3500 && this.platformsFinished == false) {
+      this.platformsFinished = true;
       this.player.body.setOffset(50, 20);
     } else if (this.platformsFinished == false) {
-       // update platforms 
-    this.platforms.children.iterate((child) => {
-      /** @type {Phaser.Physics.Arcade.Sprite} */
-      const platform = child;
+      // update platforms
+      this.platforms.children.iterate((child) => {
+        /** @type {Phaser.Physics.Arcade.Sprite} */
+        const platform = child;
 
-      // add new platforms above once platforms disappear below bottom line.      
-      if (platform.y >= scrollY + 750) {
-        // if platform is 750 below current scrollY
-        platform.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
-        platform.x = Phaser.Math.Between(0, game.config.width); // random new x position
-        platform.body.updateFromGameObject(); // update position
-        this.addLightningAbove(platform); // add Lightning
-      }
-    });
+        // add new platforms above once platforms disappear below bottom line.
+        if (platform.y >= scrollY + 750) {
+          // if platform is 750 below current scrollY
+          platform.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
+          platform.x = Phaser.Math.Between(0, game.config.width); // random new x position
+          platform.body.updateFromGameObject(); // update position
+          this.addLightningAbove(platform); // add Lightning
+        }
+      });
     }
     // ============= UPDATE CLOUDS ==============
     if (this.platformsFinished == true) {
       this.clouds.children.iterate((child) => {
         const cloud = child;
 
-        console.log('scrollY',scrollY," playerY",this.player.y);
-        console.log('cloudY',cloud.y," limitY",scrollY + 750);
-        // add new clouds above once clouds disappear below bottom line.      
+        // console.log('scrollY',scrollY," playerY",this.player.y);
+        // console.log('cloudY',cloud.y," limitY",scrollY + 750);
+        // add new clouds above once clouds disappear below bottom line.
         if (cloud.y >= scrollY + 750) {
           // if cloud is 750 below current scrollY
           cloud.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
@@ -673,28 +796,26 @@ class Game extends Phaser.Scene {
       });
     }
 
-   
-    // update clouds 
-
-   
+    // update clouds
 
     const touchingDown = this.player.body.touching.down;
 
-    if (touchingDown) {}
+    if (touchingDown) {
+    }
 
-    const playerJump = -310
-    const playerVelocity = 300
-    
+    const playerJump = -310;
+    const playerVelocity = 300;
+
     // Control the player with left or right keys
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-playerVelocity);
       if (this.player.body.onFloor()) {
-        this.player.play('taneRun', true);
+        this.player.play("taneRun", true);
       }
     } else if (this.cursors.right.isDown) {
       this.player.setVelocityX(playerVelocity);
       if (this.player.body.onFloor()) {
-        this.player.play('taneRun', true);
+        this.player.play("taneRun", true);
       }
     } else {
       // If no keys are pressed, the player keeps still
@@ -702,7 +823,7 @@ class Game extends Phaser.Scene {
       // Only show the idle animation if the player is footed
       // If this is not included, the player would look idle while jumping
       if (this.player.body.onFloor()) {
-        this.player.play('taneIdle', true);
+        this.player.play("taneIdle", true);
       }
     }
 
@@ -717,89 +838,89 @@ class Game extends Phaser.Scene {
       //player is on the ground, so he is allowed to start a jump
       this.jumptimer = 1;
       this.player.body.velocity.y = playerJump;
-      this.player.play('taneJump', false);
-      
+      this.player.play("taneJump", false);
+
       // Jump sounds
-      // this.sound.play("jump1"); 
-      const random = Phaser.Math.Between(1, 9)
+      // this.sound.play("jump1");
+      const random = Phaser.Math.Between(1, 9);
       switch (random) {
         case 1:
-          this.sound.play("maleJump1"); 
-          break
+          this.sound.play("maleJump1");
+          break;
         case 2:
-          this.sound.play("maleJump2"); 
-          break
+          this.sound.play("maleJump2");
+          break;
         case 3:
-          this.sound.play("maleJump3"); 
-          break
+          this.sound.play("maleJump3");
+          break;
         case 4:
-          this.sound.play("maleJump4"); 
-          break
+          this.sound.play("maleJump4");
+          break;
         case 5:
-          this.sound.play("maleJump5"); 
-          break
+          this.sound.play("maleJump5");
+          break;
         case 6:
-          this.sound.play("maleJump6"); 
-          break
+          this.sound.play("maleJump6");
+          break;
         case 7:
-          this.sound.play("maleJump7"); 
-          break
+          this.sound.play("maleJump7");
+          break;
         case 8:
-          this.sound.play("maleJump8"); 
-          break
+          this.sound.play("maleJump8");
+          break;
         case 9:
-          this.sound.play("maleJump9"); 
-          break
+          this.sound.play("maleJump9");
+          break;
         default:
           return;
       }
-
-    } else if (this.cursors.space.isDown && (this.jumptimer != 0)) {
+    } else if (this.cursors.space.isDown && this.jumptimer != 0) {
       //player is no longer on the ground, but is still holding the jump key
-      if (this.jumptimer > 30) { // player has been holding jump for over 30 frames, it's time to stop him
+      if (this.jumptimer > 30) {
+        // player has been holding jump for over 30 frames, it's time to stop him
         this.jumptimer = 0;
         // this.player.play('taneJump', false);
-      } else { // player is allowed to jump higher (not yet 30 frames of jumping)
+      } else {
+        // player is allowed to jump higher (not yet 30 frames of jumping)
         this.jumptimer++;
         this.player.body.velocity.y = playerJump;
         // this.player.play('taneJump', false);
       }
-    } else if (this.jumptimer != 0) { //reset this.jumptimer since the player is no longer holding the jump key
+    } else if (this.jumptimer != 0) {
+      //reset this.jumptimer since the player is no longer holding the jump key
       this.jumptimer = 0;
       // this.player.play('taneJump', false);
     }
 
-       // flip player
-       if (this.player.body.velocity.x > 0) {
-        this.player.setFlipX(true);
-      } else if (this.player.body.velocity.x < 0) {
-        // otherwise, make them face the other side
-        this.player.setFlipX(false);
-      }
-
-
+    // flip player
+    if (this.player.body.velocity.x > 0) {
+      this.player.setFlipX(true);
+    } else if (this.player.body.velocity.x < 0) {
+      // otherwise, make them face the other side
+      this.player.setFlipX(false);
+    }
 
     this.horizontalWrap(this.player);
 
     const bottomPlatform = this.findBottomMostPlatform(this.platformsFinished);
-    console.log("bottom platform:",bottomPlatform.y)
+    console.log("bottom platform:", bottomPlatform.y);
 
     // death by falling
     if (this.player.y > bottomPlatform.y + 500) {
-      console.log('you were too slow and bottom caught ya. you died.');
-      this.deathBy = "falling"
-      this.scene.start("game-over",{deathBy: this.deathBy});
+      console.log("you were too slow and bottom caught ya. you died.");
+      this.deathBy = "falling";
+      this.scene.start("game-over", { deathBy: this.deathBy });
     }
   }
 
   findBottomMostPlatform(platformsFinished) {
-    // console.log('got bottom'); 
-    let platforms = null
+    // console.log('got bottom');
+    let platforms = null;
     if (platformsFinished == false) {
       platforms = this.platforms.getChildren();
     } else if (platformsFinished) {
-      platforms = this.clouds.getChildren() ;
-    } 
+      platforms = this.clouds.getChildren();
+    }
 
     let bottomPlatform = platforms[0];
 
@@ -841,25 +962,26 @@ class Game extends Phaser.Scene {
     // set token y position
     // const y = sprite.y - sprite.displayHeight;
     const y = sprite.y;
-        const lightning = this.lightning.get(sprite.x, y, "lightning");
-        lightning.setScale(2)
-        lightning.setActive(true);
-        lightning.setVisible(true);
-        this.add.existing(lightning);
-        lightning.body.setSize(lightning.width/10 , lightning.height-30).setOffset(17,30);
-        // lightning.play("goldCoin", true);
-        lightning.play("lightning", true);
-        const random = Phaser.Math.Between(1, 2);
-        console.log('lightning random:',random)
-        if (random == 1) {
-          this.sound.play("lightning1");
-        } else if (random == 2) {
-        this.sound.play("lightning2");
-        }
-        // this.physics.world.enable(lightning);
-        return lightning;
-      
-   
+    const lightning = this.lightning.get(sprite.x, y, "lightning");
+    lightning.setScale(2);
+    lightning.setActive(true);
+    lightning.setVisible(true);
+    this.add.existing(lightning);
+    lightning.body
+      .setSize(lightning.width / 10, lightning.height - 30)
+      .setOffset(17, 30);
+    lightning.setDepth(1004);
+    // lightning.play("goldCoin", true);
+    lightning.play("lightning", true);
+    const random = Phaser.Math.Between(1, 2);
+    console.log("lightning random:", random);
+    if (random == 1) {
+      this.sound.play("lightning1");
+    } else if (random == 2) {
+      this.sound.play("lightning2");
+    }
+    // this.physics.world.enable(lightning);
+    return lightning;
   }
   addOrb(colour) {
     // set token y position
@@ -872,23 +994,23 @@ class Game extends Phaser.Scene {
     switch (colour) {
       case "blue":
         const blueOrb = this.orbs.get(x, y, "blueOrb");
-        blueOrb.setScale(2)
+        blueOrb.setScale(2);
         blueOrb.setActive(true);
         blueOrb.setVisible(true);
         this.add.existing(blueOrb);
-        blueOrb.body.setSize(blueOrb.width/2, blueOrb.height/2);
+        blueOrb.body.setSize(blueOrb.width / 2, blueOrb.height / 2);
         // blueOrb.play("goldCoin", true);
-        blueOrb.play("blueOrb"); 
+        blueOrb.play("blueOrb");
         // this.physics.world.enable(blueOrb);
         return blueOrb;
         break;
       case "pink":
         const pinkOrb = this.orbs.get(x, y, "pinkOrb");
-        pinkOrb.setScale(2)
+        pinkOrb.setScale(2);
         pinkOrb.setActive(true);
         pinkOrb.setVisible(true);
         this.add.existing(pinkOrb);
-        pinkOrb.body.setSize(pinkOrb.width/2, pinkOrb.height/2);
+        pinkOrb.body.setSize(pinkOrb.width / 2, pinkOrb.height / 2);
         // pinkOrb.play("silverCoin", true);
         pinkOrb.play("pinkOrb");
         // this.physics.world.enable(pinkOrb);
@@ -905,12 +1027,12 @@ class Game extends Phaser.Scene {
    * @param {Orb} orb
    */
   handleLightningStrike() {
-    console.log('you got zapped!');
-    this.lives--
-     if (this.lives <= 1) {
-      this.deathBy = "lightning"
-      this.scene.start("game-over",{deathBy: this.deathBy});
-     }
+    console.log("you got zapped!");
+    this.lives--;
+    if (this.lives <= 1) {
+      this.deathBy = "lightning";
+      this.scene.start("game-over", { deathBy: this.deathBy });
+    }
   }
 
   handleCollectOrb(player, orb) {
@@ -923,13 +1045,48 @@ class Game extends Phaser.Scene {
     this.orbs.killAndHide(orb);
     this.physics.world.disableBody(orb.body);
 
-    this.dreamCount++
-      this.sound.play("powerup");
-      this.dreamsText.setText(`Dreams: ${this.dreamCount}`);
-
+    this.dreamCount++;
+    this.sound.play("powerup");
+    this.dreamsText.setText(`Dreams: ${this.dreamCount}`);
   }
 
- 
+  launchFireworks() {
+    this.sound.play("fireworksSound");
+    const bottomOfScreen = -11000 + 740;
+    const rand1x = Phaser.Math.Between(0, game.config.width);
+    const rand1y = Phaser.Math.Between(300, 740);
+    const rand2x = Phaser.Math.Between(0, game.config.width);
+    const rand2y = Phaser.Math.Between(300, 740);
+    const fireworks = this.add
+      .sprite(rand1x, bottomOfScreen, "fireworksRocket")
+      .setDepth(1005);
+    const fireworks1 = this.add
+      .sprite(rand2x, bottomOfScreen, "fireworksRocket")
+      .setDepth(1005);
+    fireworks.play("fireworksRocket");
+    this.tweens
+      .add({
+        targets: fireworks,
+        y: bottomOfScreen - rand1y,
+        duration: 2000,
+        ease: "Power2",
+      })
+      .on("complete", (anim, frame) => {
+        fireworks.setScale(2);
+        fireworks.play("fireworksBlue");
+      });
+    this.tweens
+      .add({
+        targets: fireworks1,
+        y: bottomOfScreen - rand2y,
+        duration: 2500,
+        ease: "Power2",
+      })
+      .on("complete", (anim, frame) => {
+        fireworks1.setScale(2);
+        fireworks1.play("fireworksBlue");
+      });
+  }
 
   moveHero(e) {
     // set hero velocity according to input horizontal coordinate
@@ -940,12 +1097,12 @@ class Game extends Phaser.Scene {
     // keyboard controller
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-300);
-      this.player.play("taneRun")
+      this.player.play("taneRun");
     } else if (this.cursors.right.isDown) {
       this.player.setVelocityX(300);
-      this.player.play("taneRun")
+      this.player.play("taneRun");
     } else {
-      this.player.play("taneIdle",true)
+      this.player.play("taneIdle", true);
     }
   }
 
@@ -962,7 +1119,7 @@ class GameOver extends Phaser.Scene {
   }
 
   init(data) {
-    this.deathBy = data.deathBy
+    this.deathBy = data.deathBy;
   }
 
   preload() {
@@ -975,11 +1132,10 @@ class GameOver extends Phaser.Scene {
   create() {
     this.sound.stopAll();
 
-
     if (this.deathBy == "falling") {
-      this.sound.play("falling")
+      this.sound.play("falling");
     } else if (this.deathBy == "lightning") {
-      this.sound.play("death")
+      this.sound.play("death");
     }
 
     // load song
@@ -988,9 +1144,8 @@ class GameOver extends Phaser.Scene {
       loop: true,
       delay: 3000,
     };
-    this.endMusic = this.sound.add("end-music", musicConfig);    
+    this.endMusic = this.sound.add("end-music", musicConfig);
     this.endMusic.play();
-   
 
     const width = this.scale.width;
     const height = this.scale.height;
