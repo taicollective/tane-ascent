@@ -42,7 +42,7 @@ window.onload = function () {
         gravity: {
           y: 600,
         },
-        debug: false,
+        debug: true,
       },
     },
     scene: [Game, GameOver, YouWin],
@@ -174,6 +174,11 @@ class Game extends Phaser.Scene {
       "hurt",
       // "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fquake-hurt.ogg?v=1603606002105"
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fbad.ogg?v=1609392786467"
+    );
+    this.load.audio(
+      "death",
+      // "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fquake-hurt.ogg?v=1603606002105"
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/death.mp3?v=1649896854596"
     );
     this.load.audio(
       "good",
@@ -783,7 +788,7 @@ class Game extends Phaser.Scene {
     if (this.player.y > bottomPlatform.y + 500) {
       console.log('you were too slow and bottom caught ya. you died.');
       this.deathBy = "falling"
-      this.scene.start("game-over");
+      this.scene.start("game-over",{deathBy: this.deathBy});
     }
   }
 
@@ -903,8 +908,8 @@ class Game extends Phaser.Scene {
     console.log('you got zapped!');
     this.lives--
      if (this.lives <= 1) {
-      // this.deathBy = "lightning"
-      this.scene.start("game-over");
+      this.deathBy = "lightning"
+      this.scene.start("game-over",{deathBy: this.deathBy});
      }
   }
 
@@ -956,28 +961,36 @@ class GameOver extends Phaser.Scene {
     super("game-over");
   }
 
+  init(data) {
+    this.deathBy = data.deathBy
+  }
+
+  preload() {
+    this.load.audio(
+      "falling",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Retro%20Descending%20Short%2020.wav?v=1649892479903"
+    );
+  }
+
   create() {
     this.sound.stopAll();
+
+
+    if (this.deathBy == "falling") {
+      this.sound.play("falling")
+    } else if (this.deathBy == "lightning") {
+      this.sound.play("death")
+    }
+
     // load song
     const musicConfig = {
       volume: 0.5,
       loop: true,
       delay: 3000,
     };
-
-    // switch(this.deathBy) {
-    //   case "falling":
-    //     this.sound.play("falling")
-    //     break;
-    //   case "lightning":
-    //     this.sound.play("die")
-    //     break;
-    //   default:
-    //     return
-    // }
-
-    this.endMusic = this.sound.add("end-music", musicConfig);
+    this.endMusic = this.sound.add("end-music", musicConfig);    
     this.endMusic.play();
+   
 
     const width = this.scale.width;
     const height = this.scale.height;
