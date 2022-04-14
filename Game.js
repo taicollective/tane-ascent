@@ -42,7 +42,7 @@ window.onload = function () {
         gravity: {
           y: 600,
         },
-        debug: true,
+        debug: false,
       },
     },
     scene: [Game, GameOver, YouWin],
@@ -57,7 +57,10 @@ class Game extends Phaser.Scene {
 
   init() {
     this.lives = 3;
+    this.dreamCount = 0;
     this.tokenGoal = "";
+    this.platformsFinished = false
+    this.deathBy=""
   }
 
   preload() {
@@ -110,6 +113,22 @@ class Game extends Phaser.Scene {
       "heavenCloudsBack",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/heavenCloudsBack.png?v=1649671819866"
     );
+     this.load.image(
+      "cloud1",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/cloud1.png?v=1649822287079"
+    );
+     this.load.image(
+      "cloud2",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/cloud2.png?v=1649822287079"
+    );
+     this.load.image(
+      "cloud3",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/cloud3.png?v=1649822287079"
+    );
+     this.load.image(
+      "cloud4",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/cloud4.png?v=1649822287079"
+    );
 
 
     
@@ -139,18 +158,13 @@ class Game extends Phaser.Scene {
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Ftane-back-jump.png?v=1603605921264"
     );
 
+    // Audio
     // this.load.audio("jump", "assets/sfx/phaseJump1.wav");
     this.load.audio(
       "jump",
       // "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fquake-jump.ogg?v=1603606002409"
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fjump.ogg?v=1609392787230"
     );
-    this.load.audio(
-      "jump1",
-      // "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fquake-jump.ogg?v=1603606002409"
-      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%201%20-%20Sound%20effects%20Pack%202.wav?v=1649890917248"
-    );
-    
     this.load.audio(
       "die",
       // "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fquake-die.ogg?v=1603606001864",
@@ -176,6 +190,66 @@ class Game extends Phaser.Scene {
     this.load.audio(
       "cheer",
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fcheer.wav?v=1609537053752"
+    );
+    this.load.audio(
+      "jump1",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%201%20-%20Sound%20effects%20Pack%202.wav?v=1649890484928"
+    );
+    this.load.audio(
+      "lightning1",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Explosion%203%20-%20Sound%20effects%20Pack%202.wav?v=1649890485563"
+    );
+    this.load.audio(
+      "lightning2",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Explosion%205%20-%20Sound%20effects%20Pack%202.wav?v=1649890482815"
+    );
+    this.load.audio(
+      "powerup",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Retro%20Event%20StereoUP%2002.wav?v=1649892494671"
+    );
+    this.load.audio(
+      "falling",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Retro%20Descending%20Short%2020.wav?v=1649892479903"
+    );
+    this.load.audio(
+      "maleJump1",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%202.wav?v=1649892575856"
+    );
+    this.load.audio(
+      "maleJump2",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%203.wav?v=1649892576040"
+    );
+    this.load.audio(
+      "maleJump3",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%204.wav?v=1649892575908"
+    );
+    this.load.audio(
+      "maleJump4",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%205.wav?v=1649892576222"
+    );
+    this.load.audio(
+      "maleJump5",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%206.wav?v=1649892576326"
+    );
+    this.load.audio(
+      "maleJump6",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%207.wav?v=1649892576626"
+    );
+    this.load.audio(
+      "maleJump7",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%208.wav?v=1649892576839"
+    );
+    this.load.audio(
+      "maleJump8",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%209.wav?v=1649892577079"
+    );
+    this.load.audio(
+      "maleJump9",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Jump%2010.wav?v=1649892577316"
+    );
+    this.load.audio(
+      "moaMusic",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Moa-Hunting-Tai-Collective.mp3?v=1649892321064"
     );
 
     // TANE !!! (From Ariki Creative)
@@ -235,6 +309,7 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+    // ================= MUSIC =================
     this.sound.stopAll();
     // load song
     const musicConfig = {
@@ -242,29 +317,48 @@ class Game extends Phaser.Scene {
       loop: true,
       delay: 3000,
     };
-    this.music = this.sound.add("music", musicConfig);
-    // this.music.play();
+    this.music = this.sound.add("moaMusic", musicConfig);
+    this.music.play();
 
-    // load google font
+    // ================= LIVES TEXT =================
+    // Lives (text)
     WebFont.load({
       google: {
         families: ["Freckle Face", "Finger Paint", "Nosifer"],
       },
       active: () => {
         this.livesText = this.add
-          .text(game.config.width / 2, 50, "Lives: " + this.lives, {
+          .text(420, 50, "Lives: " + this.lives, {
             fontFamily: "Freckle Face",
             fontSize: 50,
             color: "#ffffff",
           })
           .setShadow(2, 2, "#333333", 2, false, true);
-        this.livesText.setAlign("center");
+        this.livesText.setAlign("right");
         this.livesText.setOrigin();
         this.livesText.setScrollFactor(0);
       },
     });
+    // Orbs (text)
+    WebFont.load({
+      google: {
+        families: ["Freckle Face", "Finger Paint", "Nosifer"],
+      },
+      active: () => {
+        this.dreamsText = this.add
+          .text(140, 50, "Dreams: " + this.dreamCount, {
+            fontFamily: "Freckle Face",
+            fontSize: 50,
+            color: "#ffffff",
+          })
+          .setShadow(2, 2, "#333333", 2, false, true);
+        this.dreamsText.setAlign("center");
+        this.dreamsText.setOrigin();
+        this.dreamsText.setScrollFactor(0);
+      },
+    });
 
-    // ================= BACKGROUND LAYERS
+    // ================= BACKGROUND LAYERS =================
     this.backdrop = this.add.image(300, -5000, "bg1");
     this.add.image(300, -3400, "bg2").setScrollFactor(0.8);
     this.add.image(300, -3600, "bg3").setScrollFactor(0.9);
@@ -276,7 +370,6 @@ class Game extends Phaser.Scene {
     this.add.image(100, -5100 , "heavenCloudsFront").setScrollFactor(0.52);
     console.log('this.backdrop',this.backdrop);
     console.log('this.planets',this.planets);
-
 
     // this.add
     //   .tileSprite(
@@ -290,10 +383,17 @@ class Game extends Phaser.Scene {
     //   .setAlpha(0.2)
     //   .setScale(1);
 
+    // ================= PLATFORMS =================
     this.platforms = this.physics.add.staticGroup();
+    this.clouds = this.physics.add.staticGroup()
+    // this.clouds = this.physics.add.group({
+    //   allowGravity: false,
+    //   immovable: true
+    // });
 
     let firstPlatform = true;
 
+    // ================== PLATFORMS ==================
     // then create 5 platforms from the group
     for (let i = 0; i < 5; ++i) {
       let x = Phaser.Math.Between(80, 400); //320
@@ -315,11 +415,29 @@ class Game extends Phaser.Scene {
       const body = platform.body;
       body.updateFromGameObject();
     }
+    // ================== CLOUDS ==================
+    for (let i = 0; i < 5; ++i) {
+      const cloudNames = ["cloud1","cloud2","cloud3","cloud4"]
+      let x = Phaser.Math.Between(80, 400); //320
+      let rand = Phaser.Math.Between(0, 3); //320
+      const y = -4000 + ( 154 * i);
+      // const y = -5500 + (Phaser.Math.Between(160, 170 ) * i);
+
+      /** @type {Phaser.Physics.Arcade.Sprite} */
+      const cloud = this.clouds.create(x, y, cloudNames[rand]);
+      cloud.scale = 0.3;
+      cloud.body.setSize(cloud.width, 10).setOffset(0,cloud.height)
+      cloud.setDepth(1000)
+      /** @type {Phaser.Physics.Arcade.StaticBody} */
+      const body = cloud.body;
+      body.updateFromGameObject();
+    }
 
     // this.cameras.main.scrollY = -8000
     // this.cameras.main.scrollY = -9500
     // this.cameras.main.scrollY = -5500
 
+    // ================= PLAYER =================
     this.player = this.physics.add
       .sprite(240, 320, "taneIdle")
 
@@ -327,30 +445,18 @@ class Game extends Phaser.Scene {
     //   .sprite(240, -5500, "taneIdle")
       // .setScale(0.08);
 
-
-    this.player.body.setSize(30, 50).setOffset(50, 50);
-    // .setSize(50, 1500).setOffset(850, 100);
-
+    this.player.body.setSize(30, 70).setOffset(50, 30);
     this.physics.add.collider(this.platforms, this.player);
+    this.physics.add.collider(this.clouds, this.player);
 
     // this.startPlatform = this.platforms.create(this.player.x, this.player.y + 120, "platform").setScale(0.2);
     // const body = this.startPlatform.body;
     // body.updateFromGameObject() ;
 
-    this.player.body.checkCollision.up = false;
-    this.player.body.checkCollision.left = false;
-    this.player.body.checkCollision.right = false;
-
     // this.cameras.main.startFollow(this.player);
     this.cameras.main.setDeadzone(this.scale.width * 1.5);
 
-    this.orbs = this.physics.add.group({
-      classType: Orb,
-      allowGravity: false,
-      immovable: true
-    });
-
-    //================ Animations
+    //================ ANIMATIONS =================
     this.anims.create({
       key: "bee",
       frames: [
@@ -447,7 +553,7 @@ class Game extends Phaser.Scene {
     this.anims.create({
       key: 'blueOrb',
       frames: 'blueOrb',
-      frameRate: 30,
+      frameRate: 60,
       repeat: -1,
     });
     this.anims.create({
@@ -463,7 +569,30 @@ class Game extends Phaser.Scene {
       repeat: -1 
     });
 
-    this.physics.add.collider(this.platforms, this.orbs);
+        // ================= GROUPS =================
+        this.orbs = this.physics.add.group({
+          classType: Orb,
+          allowGravity: false,
+          immovable: true
+        });
+        this.lightning = this.physics.add.group({
+          classType: Orb,
+          allowGravity: true,
+          immovable: false
+        });
+    
+        // ================= DREAM ORBS =================
+        // create orbs
+        for(var x = 0; x < 10; x++) {
+          this.addOrb("blue")
+        }
+        for(var x = 0; x < 10; x++) {
+          this.addOrb("pink")
+        }
+
+        
+// ================= OVERLAPS =================
+    // this.physics.add.collider(this.platforms, this.orbs);
     this.physics.add.overlap(
       this.player,
       this.orbs,
@@ -471,70 +600,78 @@ class Game extends Phaser.Scene {
       undefined,
       this
     );
-
-    // ========= CONTROLS ===========
-    // input listener to move the hero
-    // this.input.on("pointerdown", this.moveHero, this);
-    // input listener on keyboard to move the hero
-    // this.input.keyboard.on("keydown", this.moveHero, this);
-
-    // input listener to stop the hero
-    // this.input.on("pointerup", this.stopHero, this);
-    // input listener on keyboard to stop the hero
-    // this.input.keyboard.on("keyup", this.stopHero, this);
-  }
-
-  moveHero(e) {
-    // set hero velocity according to input horizontal coordinate
-    this.player.setVelocityX(
-      gameOptions.heroSpeed * (e.x > game.config.width / 2 ? 1 : -1)
+    this.physics.add.overlap(
+      this.player,
+      this.lightning,
+      this.handleLightningStrike,
+      undefined,
+      this
     );
 
-    // keyboard controller
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-300);
-      this.player.play("taneRun")
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(300);
-      this.player.play("taneRun")
-    } else {
-      this.player.play("taneIdle",true)
-    }
-  }
-
-  // method to stop the hero
-  stopHero() {
-    // ... just stop the hero :)
-    this.player.setVelocityX(0);
-  }
+  } // End of create()
 
   update(t, dt) {
     if (!this.player) {
       return;
     }
     
-  
+  // rotate orbs
+  // this.orbs.children.iterate((orb) => {
+  //   console.log("orb",orb.x,orb.y)
+  //   Phaser.Actions.RotateAround(orb, {x: orb.x, y: orb.y }, 0.02);
+  // })
+  // Phaser.Actions.RotateAroundDistance(this.orbs.getChildren(), {   x: 250, y: -400 }, 0.02, 50);
+
     // camera moving  up    
     if (this.cameras.main.scrollY > -11000) {
       this.cameras.main.scrollY -= 1.5
      }
 
-    // update platforms 
+    const scrollY = this.cameras.main.scrollY;
+    
+    // ============= UPDATE PLATFORMS ==============
+    // stop placing platforms from -500 scrollY
+    if(scrollY < -3500 && this.platformsFinished == false) {
+      this.platformsFinished=true
+      this.player.body.setOffset(50, 20);
+    } else if (this.platformsFinished == false) {
+       // update platforms 
     this.platforms.children.iterate((child) => {
       /** @type {Phaser.Physics.Arcade.Sprite} */
       const platform = child;
 
-      // add new platforms above once platforms disappear below bottom line.
-      const scrollY = this.cameras.main.scrollY;
-      console.log('scrollY',scrollY,"player xy:",this.player.x," ",this.player.y);
+      // add new platforms above once platforms disappear below bottom line.      
       if (platform.y >= scrollY + 750) {
         // if platform is 750 below current scrollY
         platform.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
         platform.x = Phaser.Math.Between(0, game.config.width); // random new x position
         platform.body.updateFromGameObject(); // update position
-       // this.addOrbAbove(platform); // add Orb/token
+        this.addLightningAbove(platform); // add Lightning
       }
     });
+    }
+    // ============= UPDATE CLOUDS ==============
+    if (this.platformsFinished == true) {
+      this.clouds.children.iterate((child) => {
+        const cloud = child;
+
+        console.log('scrollY',scrollY," playerY",this.player.y);
+        console.log('cloudY',cloud.y," limitY",scrollY + 750);
+        // add new clouds above once clouds disappear below bottom line.      
+        if (cloud.y >= scrollY + 750) {
+          // if cloud is 750 below current scrollY
+          cloud.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
+          cloud.x = Phaser.Math.Between(0, game.config.width); // random new x position
+          cloud.body.updateFromGameObject(); // update position
+          this.addLightningAbove(cloud); // add Lightning
+        }
+      });
+    }
+
+   
+    // update clouds 
+
+   
 
     const touchingDown = this.player.body.touching.down;
 
@@ -576,7 +713,42 @@ class Game extends Phaser.Scene {
       this.jumptimer = 1;
       this.player.body.velocity.y = playerJump;
       this.player.play('taneJump', false);
-      // this.sound.play("jump"); 
+      
+      // Jump sounds
+      // this.sound.play("jump1"); 
+      const random = Phaser.Math.Between(1, 9)
+      switch (random) {
+        case 1:
+          this.sound.play("maleJump1"); 
+          break
+        case 2:
+          this.sound.play("maleJump2"); 
+          break
+        case 3:
+          this.sound.play("maleJump3"); 
+          break
+        case 4:
+          this.sound.play("maleJump4"); 
+          break
+        case 5:
+          this.sound.play("maleJump5"); 
+          break
+        case 6:
+          this.sound.play("maleJump6"); 
+          break
+        case 7:
+          this.sound.play("maleJump7"); 
+          break
+        case 8:
+          this.sound.play("maleJump8"); 
+          break
+        case 9:
+          this.sound.play("maleJump9"); 
+          break
+        default:
+          return;
+      }
+
     } else if (this.cursors.space.isDown && (this.jumptimer != 0)) {
       //player is no longer on the ground, but is still holding the jump key
       if (this.jumptimer > 30) { // player has been holding jump for over 30 frames, it's time to stop him
@@ -604,11 +776,41 @@ class Game extends Phaser.Scene {
 
     this.horizontalWrap(this.player);
 
-    const bottomPlatform = this.findBottomMostPlatform();
-    if (this.player.y > bottomPlatform.y + 200) {
+    const bottomPlatform = this.findBottomMostPlatform(this.platformsFinished);
+    console.log("bottom platform:",bottomPlatform.y)
+
+    // death by falling
+    if (this.player.y > bottomPlatform.y + 500) {
+      console.log('you were too slow and bottom caught ya. you died.');
+      this.deathBy = "falling"
       this.scene.start("game-over");
-      // this.sound.play("die");
     }
+  }
+
+  findBottomMostPlatform(platformsFinished) {
+    // console.log('got bottom'); 
+    let platforms = null
+    if (platformsFinished == false) {
+      platforms = this.platforms.getChildren();
+    } else if (platformsFinished) {
+      platforms = this.clouds.getChildren() ;
+    } 
+
+    let bottomPlatform = platforms[0];
+
+    for (let i = 1; i < platforms.length; ++i) {
+      const platform = platforms[i];
+
+      // discard any platforms that are above current
+      if (platform.y < bottomPlatform.y) {
+        continue;
+      }
+
+      bottomPlatform = platform;
+    }
+    // console.log('bottom platform',bottomPlatform);
+
+    return bottomPlatform;
   }
 
   /**
@@ -630,42 +832,67 @@ class Game extends Phaser.Scene {
    * @param {Phaser.GameObjects.Sprite} sprite
    */
 
-  // addOrbAbove(sprite) {
-  //   // set token y position
-  //   // const y = sprite.y - sprite.displayHeight;
-  //   const y = sprite.y;
-  //   // get random number to determine which token to randomly place
-  //   const random = Phaser.Math.Between(1, 2);
+  addLightningAbove(sprite) {
+    // set token y position
+    // const y = sprite.y - sprite.displayHeight;
+    const y = sprite.y;
+        const lightning = this.lightning.get(sprite.x, y, "lightning");
+        lightning.setScale(2)
+        lightning.setActive(true);
+        lightning.setVisible(true);
+        this.add.existing(lightning);
+        lightning.body.setSize(lightning.width/10 , lightning.height-30).setOffset(17,30);
+        // lightning.play("goldCoin", true);
+        lightning.play("lightning", true);
+        const random = Phaser.Math.Between(1, 2);
+        console.log('lightning random:',random)
+        if (random == 1) {
+          this.sound.play("lightning1");
+        } else if (random == 2) {
+        this.sound.play("lightning2");
+        }
+        // this.physics.world.enable(lightning);
+        return lightning;
+      
+   
+  }
+  addOrb(colour) {
+    // set token y position
+    // const y = sprite.y - sprite.displayHeight;
+    const x = Phaser.Math.Between(1, 540);
+    const y = Phaser.Math.Between(-10000, 0);
+    // get random number to determine which token to randomly place
+    const random = Phaser.Math.Between(1, 2);
 
-  //   switch (random) {
-  //     case 1:
-  //       const blueOrb = this.orbs.get(sprite.x, y, "blueOrb");
-  //       blueOrb.setScale(2)
-  //       blueOrb.setActive(true);
-  //       blueOrb.setVisible(true);
-  //       this.add.existing(blueOrb);
-  //       blueOrb.body.setSize(blueOrb.width, blueOrb.height);
-  //       // blueOrb.play("goldCoin", true);
-  //       blueOrb.play("blueOrb", true);
-  //       // this.physics.world.enable(blueOrb);
-  //       return blueOrb;
-  //       break;
-  //     case 2:
-  //       const pinkOrb = this.orbs.get(sprite.x, y, "pinkOrb");
-  //       pinkOrb.setScale(2)
-  //       pinkOrb.setActive(true);
-  //       pinkOrb.setVisible(true);
-  //       this.add.existing(pinkOrb);
-  //       pinkOrb.body.setSize(pinkOrb.width, pinkOrb.height);
-  //       // pinkOrb.play("silverCoin", true);
-  //       pinkOrb.play("pinkOrb", true);
-  //       // this.physics.world.enable(pinkOrb);
-  //       return pinkOrb;
-  //       break;
-  //     default:
-  //       return;
-  //   }
-  // }
+    switch (colour) {
+      case "blue":
+        const blueOrb = this.orbs.get(x, y, "blueOrb");
+        blueOrb.setScale(2)
+        blueOrb.setActive(true);
+        blueOrb.setVisible(true);
+        this.add.existing(blueOrb);
+        blueOrb.body.setSize(blueOrb.width/2, blueOrb.height/2);
+        // blueOrb.play("goldCoin", true);
+        blueOrb.play("blueOrb"); 
+        // this.physics.world.enable(blueOrb);
+        return blueOrb;
+        break;
+      case "pink":
+        const pinkOrb = this.orbs.get(x, y, "pinkOrb");
+        pinkOrb.setScale(2)
+        pinkOrb.setActive(true);
+        pinkOrb.setVisible(true);
+        this.add.existing(pinkOrb);
+        pinkOrb.body.setSize(pinkOrb.width/2, pinkOrb.height/2);
+        // pinkOrb.play("silverCoin", true);
+        pinkOrb.play("pinkOrb");
+        // this.physics.world.enable(pinkOrb);
+        return pinkOrb;
+        break;
+      default:
+        return;
+    }
+  }
 
   /**
    *
@@ -674,10 +901,11 @@ class Game extends Phaser.Scene {
    */
   handleLightningStrike() {
     console.log('you got zapped!');
+    this.lives--
      if (this.lives <= 1) {
+      // this.deathBy = "lightning"
       this.scene.start("game-over");
-      // this.sound.play("die");
-    }
+     }
   }
 
   handleCollectOrb(player, orb) {
@@ -690,59 +918,36 @@ class Game extends Phaser.Scene {
     this.orbs.killAndHide(orb);
     this.physics.world.disableBody(orb.body);
 
-    // get orb type
-    const orbGot = orb.texture.key.split("-")[0];
-    console.log("target:", this.orbGoal, "got:", orbGot);
+    this.dreamCount++
+      this.sound.play("powerup");
+      this.dreamsText.setText(`Dreams: ${this.dreamCount}`);
 
-    // // take action depending on which orb touched
-    // if (orbGot == this.orbGoal) {
-    //   // this.sound.play("good");
-    //   if (this.orbGoal == "gold") {
-    //     // TODO: increase gold orb type
-    //     if (this.orbGoldBar.y == 250) {
-    //       console.log("YOU WIN");
-    //       this.scene.start("you-win");
-    //     } else {
-    //       this.orbGoldBar.y -= 5;
-    //     }
-    //   } else if (this.orbGoal == "silver") {
-    //     if (this.orbsilverBar.y == 150) {
-    //       console.log("YOU WIN");
-    //       this.scene.start("you-win");
-    //     } else {
-    //       this.orbsilverBar.y -= 5;
-    //     }
-    //   } else if (this.orbGoal == "bronze") {
-    //     if (this.orbBronzeBar.y == 50) {
-    //       console.log("YOU WIN");
-    //       this.scene.start("you-win");
-    //     } else {
-    //       this.orbBronzeBar.y -= 5;
-    //     }
-    //   } 
-    // } else {
-    //   this.lives--;
-    //   // this.sound.play("hurt");
-    //   this.livesText.setText(`Lives: ${this.lives}`);
-    // }
   }
 
-  findBottomMostPlatform() {
-    const platforms = this.platforms.getChildren();
-    let bottomPlatform = platforms[0];
+ 
 
-    for (let i = 1; i < platforms.length; ++i) {
-      const platform = platforms[i];
+  moveHero(e) {
+    // set hero velocity according to input horizontal coordinate
+    this.player.setVelocityX(
+      gameOptions.heroSpeed * (e.x > game.config.width / 2 ? 1 : -1)
+    );
 
-      // discard any platforms that are above current
-      if (platform.y < bottomPlatform.y) {
-        continue;
-      }
-
-      bottomPlatform = platform;
+    // keyboard controller
+    if (this.cursors.left.isDown) {
+      this.player.setVelocityX(-300);
+      this.player.play("taneRun")
+    } else if (this.cursors.right.isDown) {
+      this.player.setVelocityX(300);
+      this.player.play("taneRun")
+    } else {
+      this.player.play("taneIdle",true)
     }
+  }
 
-    return bottomPlatform;
+  // method to stop the hero
+  stopHero() {
+    // ... just stop the hero :)
+    this.player.setVelocityX(0);
   }
 }
 
@@ -759,8 +964,20 @@ class GameOver extends Phaser.Scene {
       loop: true,
       delay: 3000,
     };
+
+    // switch(this.deathBy) {
+    //   case "falling":
+    //     this.sound.play("falling")
+    //     break;
+    //   case "lightning":
+    //     this.sound.play("die")
+    //     break;
+    //   default:
+    //     return
+    // }
+
     this.endMusic = this.sound.add("end-music", musicConfig);
-    // this.endMusic.play();
+    this.endMusic.play();
 
     const width = this.scale.width;
     const height = this.scale.height;
