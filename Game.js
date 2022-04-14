@@ -42,7 +42,7 @@ window.onload = function () {
         gravity: {
           y: 600,
         },
-        debug: true,
+        debug: false,
       },
     },
     scene: [Game, GameOver, YouWin],
