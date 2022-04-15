@@ -45,29 +45,760 @@ window.onload = function () {
         debug: false,
       },
     },
-    scene: [Game, GameOver, YouWin],
+    // game scenes
+    scene: [GameIntro, Game, GameOver, YouWin],
   };
   game = new Phaser.Game(gameConfig);
   window.focus();
 };
+
+/* =========================================
+            MAIN GAME SCENE
+=========================================*/
 class Game extends Phaser.Scene {
   constructor() {
-    super("game");
+    super({
+      key: "game",
+      pack: {
+        files: [
+          {
+            // load image before preload, for us in preload
+            type: "image",
+            key: "tc-logo",
+            url: "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/all%20white.png?v=1649980778495",
+          },
+        ],
+      },
+    });
   }
 
   init() {
-    this.lives = 3;
+    // this.lives = 3;
     this.dreamCount = 0;
-    this.tokenGoal = "";
     this.platformsFinished = false;
     this.gameFinished = false;
     this.deathBy = "";
   }
 
   preload() {
+     //  Load the Google WebFont Loader script
+     this.load.script(
+      "webfont",
+      "//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"
+    );
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+  }
+
+  create() {
+    // ================= MUSIC =================
+    this.sound.stopAll();
+    // load song
+    const musicConfig = {
+      volume: 0.5,
+      loop: true,
+      delay: 3000,
+    };
+    this.music = this.sound.add("moaMusic", musicConfig);
+    this.music.play();
+
+    // ================= LIVES TEXT =================
+    // Lives (text)
+    // WebFont.load({
+    //   google: {
+    //     families: ["Freckle Face", "Finger Paint", "Nosifer"],
+    //   },
+    //   active: () => {
+    //     this.livesText = this.add
+    //       .text(420, 50, "Lives: " + this.lives, {
+    //         fontFamily: "Freckle Face",
+    //         fontSize: 50,
+    //         color: "#ffffff",
+    //       })
+    //       .setShadow(2, 2, "#333333", 2, false, true);
+    //     this.livesText.setAlign("right");
+    //     this.livesText.setOrigin();
+    //     this.livesText.setScrollFactor(0);
+    //     this.livesText.setDepth(1005);
+    //   },
+    // });
+
+    //================= DREAMS TEXT =================
+    WebFont.load({
+      google: {
+        families: ["Freckle Face", "Finger Paint", "Nosifer"],
+      },
+      active: () => {
+        this.dreamsText = this.add
+          .text(game.config.width/2, 50, "Dreams: " + this.dreamCount, {
+            fontFamily: "Freckle Face",
+            fontSize: 50,
+            color: "#ffffff",
+          })
+          .setShadow(2, 2, "#333333", 2, false, true);
+        this.dreamsText.setAlign("center");
+        this.dreamsText.setOrigin();
+        this.dreamsText.setScrollFactor(0);
+        this.dreamsText.setDepth(1005);
+      },
+    });
+
+    // ================= BACKGROUND LAYERS =================
+    this.backdrop = this.add.image(300, -5000, "bg1");
+    this.add.image(300, -3400, "bg2").setScrollFactor(0.8);
+    this.add.image(300, -3600, "bg3").setScrollFactor(0.9);
+    // this.add.image(300, -3400, "bg4").setScrollFactor(0.7);
+    this.add.image(300, -2700, "stars1").setScrollFactor(0.5).setScale(0.6);
+    this.add.image(300, -2800, "stars2").setScrollFactor(0.6).setScale(0.5);
+    this.planets = this.add.image(300, -5300, "planets").setScrollFactor(0.5);
+    this.add.image(350, -4720, "heavenCloudsBack").setScrollFactor(0.48);
+    this.add
+      .image(100, -5100, "heavenCloudsFront")
+      .setScrollFactor(0.52)
+      .setDepth(1002);
+
+    // ================= PLATFORM GROUPS =================
+    this.platforms = this.physics.add.staticGroup();
+    this.clouds = this.physics.add.staticGroup();
+
+    let firstPlatform = true;
+
+    // ================== FOR TESTING ==================
+    const startGameAtForTesting = -10100
+    // this.cameras.main.scrollY = startGameAtForTesting;
+
+    // ================== PLATFORMS ==================
+    // then create 5 platforms from the group
+    for (let i = 0; i < 5; ++i) {
+      let x = Phaser.Math.Between(80, 400); //320
+      const y = 154 * i;
+      // const y = startGameAtForTesting + Phaser.Math.Between(160, 170) * i;
+
+      // make sure first platform is below tane - middle of screen(ish)
+      if (i == 4 && firstPlatform == true) {
+        firstPlatform = false;
+        x = game.config.width / 2 - 40;
+      }
+
+      // create platform
+      const platform = this.platforms.create(x, y, "platform");
+      platform.scale = 0.2;
+      platform.setDepth(1004);
+      platform.body.updateFromGameObject();
+    }
+
+    // this.startPlatform = this.platforms.create(this.player.x, this.player.y + 120, "platform").setScale(0.2);
+    // this.startPlatform.body.updateFromGameObject() ;
+
+    // ================== CLOUDS ==================
+    for (let i = 0; i < 5; ++i) {
+      // cloud x y positions
+      let x = Phaser.Math.Between(80, 400); //320
+      let y = -4000 + 154 * i;
+      // let y = startGameAtForTesting + Phaser.Math.Between(160, 170) * i;
+      
+      // random number between 0 & 3 for cloud image to be used
+      let rand = Phaser.Math.Between(0, 3); 
+      const cloudNames = ["cloud1", "cloud2", "cloud3", "cloud4"];
+
+      // create cloud platform
+      const cloud = this.clouds.create(x, y, cloudNames[rand]);
+      cloud.scale = 0.3;
+      cloud.body.setSize(cloud.width, 10).setOffset(0, cloud.height);
+      cloud.setDepth(1004);
+      cloud.body.updateFromGameObject();
+    }
+
+    // ================= PLAYER =================
+    this.player = this.physics.add.sprite(240, 320, "taneIdle");
+    // this.player = this.physics.add.sprite(240, startGameAtForTesting, "taneIdle");
+
+    this.player.setDepth(1003);
+    this.player.body.setSize(30, 70).setOffset(50, 30);
+
+    // ================= COLLIDERS =================
+    this.physics.add.collider(this.platforms, this.player);
+    this.physics.add.collider(this.clouds, this.player);
+
+    //================ ANIMATIONS =================
+    this.anims.create({
+      key: "taneRun",
+      frames: this.anims.generateFrameNumbers("taneRun", {
+        frames: [16, 17, 18, 19, 20, 21, 22, 23],
+      }),
+      frameRate: 15,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "taneIdle",
+      frames: this.anims.generateFrameNumbers("taneIdle", {
+        frames: [0, 1, 2],
+      }),
+      frameRate: 5,
+    });
+
+    this.anims.create({
+      key: "taneJump",
+      frames: this.anims.generateFrameNumbers("taneJump", {
+        frames: [12, 13, 14, 15],
+      }),
+      frameRate: 10,
+    });
+    this.anims.create({
+      key: "blueOrb",
+      frames: "blueOrb",
+      frameRate: 60,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "pinkOrb",
+      frames: "pinkOrb",
+      frameRate: 60,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "lightning",
+      frames: "lightning",
+      frameRate: 15,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "hiwa",
+      frames: "hiwa",
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "hiwa2",
+      frames: "hiwa2",
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "fireworksBlue",
+      frames: "fireworksBlue",
+      frameRate: 30,
+    });
+    this.anims.create({
+      key: "fireworksBlue2",
+      frames: "fireworksBlue2",
+      frameRate: 30,
+    });
+    this.anims.create({
+      key: "fireworksRocket",
+      frames: "fireworksRocket",
+      frameRate: 30,
+      repeat: -1,
+    });
+
+    // ================= hiwa =================
+    this.hiwa = this.physics.add
+      .sprite(300, -4990, "hiwa")
+      .setScrollFactor(0.5)
+      .setScale(1)
+      .setDepth(1001);
+    this.hiwa.immovable = true;
+    this.hiwa.body.moves = false;
+    this.hiwa.allowGravity = false;
+    this.hiwa.play("hiwa2");
+
+    // ================= ITEM GROUPS =================
+    this.orbs = this.physics.add.group({
+      classType: Orb,
+      allowGravity: false,
+      immovable: true,
+    });
+    this.lightning = this.physics.add.group({
+      classType: Orb,
+      allowGravity: true,
+      immovable: false,
+    });
+
+    // ================= DREAM ORBS =================
+    // create orbs
+    for (var x = 0; x < 10; x++) {
+      this.addOrb("blue");
+    }
+    for (var x = 0; x < 10; x++) {
+      this.addOrb("pink");
+    }
+
+    // ================= OVERLAP EVENTS =================
+    this.physics.add.overlap(
+      this.player,
+      this.orbs,
+      this.handleCollectOrb,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.player,
+      this.lightning,
+      this.handleLightningStrike,
+      undefined,
+      this
+    );
+  } // End of create()
+
+  update(t, dt) {
+    if (!this.player) {
+      return;
+    }
+
+    //  ============= CAMERA CHASER (camera moving up) ==============
+    if (this.cameras.main.scrollY > -11000) {
+      this.cameras.main.scrollY -= 1.5;
+    } else if (
+      this.cameras.main.scrollY <= -11000 &&
+      this.gameFinished == false
+    ) {
+      // ============= GAME FINISHED ==============
+      this.gameFinished = true;
+      console.log("game finished");
+
+      this.sound.play("cheer");
+
+      this.launchFireworks();
+      for (var i = 1; i < this.dreamCount; i++) {
+        this.time.addEvent({
+          delay: i * 1000,
+          callback: this.launchFireworks,
+          callbackScope: this,
+        });
+      }
+    }
+
+    // ============= UPDATE PLATFORMS ==============
+    // get cameras changing scrollY
+    const scrollY = this.cameras.main.scrollY;
+    // stop placing platforms from -3500 scrollY (stop placing platforms at this height, and start placing clouds instead)
+    if (scrollY < -3500 && this.platformsFinished == false) {
+      // flag to catch change from platforms to clouds
+      this.platformsFinished = true;
+      // offset player body so looks like he is standing in the clouds.
+      this.player.body.setOffset(50, 20);
+    } else if (this.platformsFinished == false) {
+      // update platforms
+      this.platforms.children.iterate((child) => {
+        const platform = child;
+        // add new platforms above once platforms disappear below bottom line.
+        // if platform is 750 below current scrollY
+        if (platform.y >= scrollY + 750) {
+          platform.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
+          platform.x = Phaser.Math.Between(0, game.config.width); // random new x position
+          platform.body.updateFromGameObject(); // update position
+          this.addLightningAbove(platform); // add Lightning
+        }
+      });
+    }
+    // ============= UPDATE CLOUDS ==============
+    if (this.platformsFinished == true) {
+      this.clouds.children.iterate((child) => {
+        const cloud = child;
+        // add new clouds above once clouds disappear below bottom line.
+        // if cloud is 750 below current scrollY
+        if (cloud.y >= scrollY + 750) {
+          cloud.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
+          cloud.x = Phaser.Math.Between(0, game.config.width); // random new x position
+          cloud.body.updateFromGameObject(); // update position
+          this.addLightningAbove(cloud); // add Lightning
+        }
+      });
+    }
+    
+    const playerJump = -310;
+    const playerVelocity = 300;
+
+    // ============= PLAYER CONTROLS ==============
+    // ---- Left control ----
+    if (this.cursors.left.isDown) {
+      this.player.setVelocityX(-playerVelocity);
+      if (this.player.body.onFloor()) {
+        this.player.play("taneRun", true);
+      }
+    }
+    // ---- Right control ---- 
+    else if (this.cursors.right.isDown) {
+      this.player.setVelocityX(playerVelocity);
+      if (this.player.body.onFloor()) {
+        this.player.play("taneRun", true);
+      }
+    } 
+    // ---- Idle ----
+    else {
+      // If no keys are pressed, the player keeps still
+      this.player.setVelocityX(0);
+      // Only show the idle animation if the player is footed (If this is not included, the player would look idle while jumping)
+      if (this.player.body.onFloor()) {
+        this.player.play("taneIdle", true);
+      }
+    }
+    // ---- Jump control ----
+    if (this.cursors.space.isDown && this.player.body.onFloor()) {
+      //player is on the ground, so he is allowed to start a jump
+      this.jumptimer = 1;
+      this.player.body.velocity.y = playerJump;
+      this.player.play("taneJump", false);
+
+      // Jump sounds
+      const random = Phaser.Math.Between(1, 9);
+      switch (random) {
+        case 1:
+          this.sound.play("maleJump1");
+          break;
+        case 2:
+          this.sound.play("maleJump2");
+          break;
+        case 3:
+          this.sound.play("maleJump3");
+          break;
+        case 4:
+          this.sound.play("maleJump4");
+          break;
+        case 5:
+          this.sound.play("maleJump5");
+          break;
+        case 6:
+          this.sound.play("maleJump6");
+          break;
+        case 7:
+          this.sound.play("maleJump7");
+          break;
+        case 8:
+          this.sound.play("maleJump8");
+          break;
+        case 9:
+          this.sound.play("maleJump9");
+          break;
+        default:
+          return;
+      }
+    } 
+    // Jump hold
+    else if (this.cursors.space.isDown && this.jumptimer != 0) {
+      //player is no longer on the ground, but is still holding the jump key
+      if (this.jumptimer > 30) {
+        // player has been holding jump for over 30 frames, it's time to stop him
+        this.jumptimer = 0;
+        // this.player.play('taneJump', false);
+      } else {
+        // player is allowed to jump higher (not yet 30 frames of jumping)
+        this.jumptimer++;
+        this.player.body.velocity.y = playerJump;
+        // this.player.play('taneJump', false);
+      }
+    } else if (this.jumptimer != 0) {
+      //reset this.jumptimer since the player is no longer holding the jump key
+      this.jumptimer = 0;
+      // this.player.play('taneJump', false);
+    }
+
+    // flip player
+    if (this.player.body.velocity.x > 0) {
+      this.player.setFlipX(true);
+    } else if (this.player.body.velocity.x < 0) {
+      // otherwise, make them face the other side
+      this.player.setFlipX(false);
+    }
+
+    // ability to wrap around sides (walk all the right and appear again on the left)
+    this.horizontalWrap(this.player);
+
+
+    // ============= DEATH BY FALLING ==============
+    // get bottom most platform
+    const bottomPlatform = this.findBottomMostPlatform(this.platformsFinished);
+    // check if player has fallen below last platform
+    if (this.player.y > bottomPlatform.y + 500) {
+      console.log("you were too slow and bottom caught ya. you died.");
+      this.deathBy = "falling";
+      // player died
+      this.scene.start("game-over", { deathBy: this.deathBy });
+    }
+  }// End of update()
+
+  // ============= CUSTOM FUNCTIONS ==============
+  moveHero(e) {
+    // set hero velocity according to input horizontal coordinate
+    this.player.setVelocityX(
+      gameOptions.heroSpeed * (e.x > game.config.width / 2 ? 1 : -1)
+    );
+
+    // keyboard controller
+    if (this.cursors.left.isDown) {
+      this.player.setVelocityX(-300);
+      this.player.play("taneRun");
+    } else if (this.cursors.right.isDown) {
+      this.player.setVelocityX(300);
+      this.player.play("taneRun");
+    } else {
+      this.player.play("taneIdle", true);
+    }
+  }
+
+  // method to stop the hero
+  stopHero() {
+    // ... just stop the hero :)
+    this.player.setVelocityX(0);
+  }
+
+  findBottomMostPlatform(platformsFinished) {
+    let platforms = null;
+    if (platformsFinished == false) {
+      platforms = this.platforms.getChildren();
+    } else if (platformsFinished) {
+      platforms = this.clouds.getChildren();
+    }
+
+    let bottomPlatform = platforms[0];
+
+    for (let i = 1; i < platforms.length; ++i) {
+      const platform = platforms[i];
+      // discard any platforms that are above current
+      if (platform.y < bottomPlatform.y) {
+        continue;
+      }
+      bottomPlatform = platform;
+    }
+    return bottomPlatform;
+  }
+
+  horizontalWrap(sprite) {
+    const halfWidth = sprite.displayWidth * 0.5;
+    const gameWidth = this.scale.width;
+    if (sprite.x < -halfWidth) {
+      sprite.x = gameWidth + halfWidth;
+    } else if (sprite.x > gameWidth + halfWidth) {
+      sprite.x = -halfWidth;
+    }
+  }
+
+  addLightningAbove(sprite) {
+    const y = sprite.y;
+    const randomX = Phaser.Math.Between(50, game.config.width-50);
+    // const lightning = this.lightning.get(sprite.x, y, "lightning");
+    const lightning = this.lightning.get(randomX, y, "lightning");
+    lightning.setOrigin(0,0);
+    lightning.setScale(2);
+    lightning.setActive(true);
+    lightning.setVisible(true);
+    this.add.existing(lightning);
+    lightning.body
+      .setSize(lightning.width / 10, lightning.height - 30)
+      .setOffset(17, 30);
+    lightning.setDepth(1004);
+    // play lightning animation
+    lightning.play("lightning", true);
+    // 2 lightning sounds
+    const random = Phaser.Math.Between(1, 2);
+    if (random == 1) {
+      this.sound.play("lightning1");
+    } else if (random == 2) {
+      this.sound.play("lightning2");
+    }
+    return lightning;
+  }
+
+  addOrb(colour) {
+    const x = Phaser.Math.Between(1, 540);
+    const y = Phaser.Math.Between(-10000, 0);
+    // get random number to determine which orb to randomly place
+    // const random = Phaser.Math.Between(1, 2);
+    switch (colour) {
+      case "blue":
+        const blueOrb = this.orbs.get(x, y, "blueOrb");
+        blueOrb.setScale(2);
+        blueOrb.setActive(true);
+        blueOrb.setVisible(true);
+        this.add.existing(blueOrb);
+        blueOrb.body.setSize(blueOrb.width / 2, blueOrb.height / 2);
+        blueOrb.play("blueOrb");
+        return blueOrb;
+        break;
+      case "pink":
+        const pinkOrb = this.orbs.get(x, y, "pinkOrb");
+        pinkOrb.setScale(2);
+        pinkOrb.setActive(true);
+        pinkOrb.setVisible(true);
+        this.add.existing(pinkOrb);
+        pinkOrb.body.setSize(pinkOrb.width / 2, pinkOrb.height / 2);
+        pinkOrb.play("pinkOrb");
+        return pinkOrb;
+        break;
+      default:
+        return;
+    }
+  }
+
+  handleLightningStrike() {
+    console.log("you got zapped!");
+    this.deathBy = "lightning";
+    this.scene.start("game-over", { deathBy: this.deathBy });
+  }
+
+  handleCollectOrb(player, orb) {
+    this.orbs.killAndHide(orb);
+    this.physics.world.disableBody(orb.body);
+
+    this.dreamCount++;
+    this.sound.play("powerup");
+    this.dreamsText.setText(`Dreams: ${this.dreamCount}`);
+  }
+
+  launchFireworks() {
+    this.sound.play("fireworksSound");
+    const bottomOfScreen = -11000 + 740;
+    const rand1x = Phaser.Math.Between(0, game.config.width);
+    const rand1y = Phaser.Math.Between(300, 740);
+    const rand2x = Phaser.Math.Between(0, game.config.width);
+    const rand2y = Phaser.Math.Between(300, 740);
+    const fireworks = this.add
+      .sprite(rand1x, bottomOfScreen, "fireworksRocket")
+      .setDepth(1005);
+    const fireworks1 = this.add
+      .sprite(rand2x, bottomOfScreen, "fireworksRocket")
+      .setDepth(1005);
+    fireworks.play("fireworksRocket");
+    this.tweens
+      .add({
+        targets: fireworks,
+        y: bottomOfScreen - rand1y,
+        duration: 2000,
+        ease: "Power2",
+      })
+      .on("complete", (anim, frame) => {
+        fireworks.setScale(2);
+        fireworks.play("fireworksBlue");
+      });
+    this.tweens
+      .add({
+        targets: fireworks1,
+        y: bottomOfScreen - rand2y,
+        duration: 2500,
+        ease: "Power2",
+      })
+      .on("complete", (anim, frame) => {
+        fireworks1.setScale(2);
+        fireworks1.play("fireworksBlue");
+      });
+  }
+
+}
+
+var sceneConfig = {
+  // ....
+  pack: {
+    files: [
+      {
+        type: "plugin",
+        key: "rexwebfontloaderplugin",
+        url: "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexwebfontloaderplugin.min.js",
+        start: true,
+      },
+        {
+          type: "image",
+          key: "tc-logo",
+          url: "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/all%20white.png?v=1649980778495",
+        },
+    ],
+  },
+};
+class GameIntro extends Phaser.Scene {
+  constructor() {
+    super(sceneConfig);
+  }
+
+  init(data) {}
+
+  preload() {
+    // loading bar
+    var width = this.cameras.main.width;
+    var height = this.cameras.main.height;
+    var loadingText = this.make.text({
+      x: width / 2,
+      y: height / 2 - 110,
+      text: "Loading...",
+      style: {
+        font: "20px monospace",
+        fill: "#ffffff",
+      },
+    });
+    var madeByText = this.make.text({
+      x: width / 2,
+      y: height / 2 - 25,
+      text: "game by",
+      style: {
+        font: "20px monospace",
+        fill: "#ffffff",
+      },
+    });
+
+    loadingText.setOrigin(0.5, 0.5);
+    madeByText.setOrigin(0.5, 0.5);
+    this.add.image(width / 2, height / 2 + 125, "tc-logo").setDisplaySize(250,250);
+    var progressBar = this.add.graphics();
+    var progressBox = this.add.graphics();
+    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillRect(game.config.width / 2 - 320 / 2, 270, 320, 50);
+
+    this.plugins.get("rexwebfontloaderplugin").addToScene(this);
+    this.load.rexWebFont({
+      google: {
+        families: ["Freckle Face", "Finger Paint", "Nosifer"],
+      },
+    });
+
     this.load.image(
       "background",
-      "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fbg_layer1.png?v=1603605919212"
+      "https://cdn.glitch.com/f605c78d-cefb-481c-bb78-d09a6bffa1e6%2Fbg_layer1.png?v=1603601139028"
+    );
+
+    this.load.image(
+      "kowhaiwhai",
+      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
+    );
+
+    this.load.scenePlugin(
+      "rexuiplugin",
+      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js",
+      "rexUI",
+      "rexUI"
+    );
+
+    this.load.spritesheet(
+      "hiwa2",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/hiwa-spritesheet-2.png?v=1649986716254",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    );
+
+    this.load.spritesheet(
+      "blueOrb",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/blue-orb-spritesheet.png?v=1649574549090",
+      {
+        frameWidth: 32,
+        frameHeight: 32,
+      }
+    );
+
+    this.load.image(
+      "background",
+      "https://cdn.glitch.com/f605c78d-cefb-481c-bb78-d09a6bffa1e6%2Fbg_layer1.png?v=1603601139028"
+    );
+
+    this.load.image(
+      "tc-logo",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/all%20white.png?v=1649980778495"
+    );
+
+    
+
+    this.load.image(
+      "kowhaiwhai",
+      "https://cdn.glitch.com/cd67e3a9-81c5-485d-bf8a-852d63395343%2Fkowhaiwhai.png?v=1609829230478"
     );
     // this.load.image(
     //   "bg1",
@@ -320,7 +1051,7 @@ class Game extends Phaser.Scene {
     );
     this.load.spritesheet(
       "hiwa2",
-      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/hiwa-spritesheet-2.png?v=1649905580963",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/hiwa-spritesheet-2.png?v=1649986716254",
       {
         frameWidth: 128,
         frameHeight: 128,
@@ -351,296 +1082,54 @@ class Game extends Phaser.Scene {
       }
     );
 
-    this.cursors = this.input.keyboard.createCursorKeys();
-
-    //  Load the Google WebFont Loader script
-    this.load.script(
-      "webfont",
-      "//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"
-    );
-
-    // rexUI plugin
-    this.load.scenePlugin(
-      "rexuiplugin",
-      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js",
-      "rexUI",
-      "rexUI"
-    );
+     // Pre-loader
+     this.load.on("progress", function (value) {
+      console.log(value);
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(
+        game.config.width / 2 - 300 / 2,
+        280,
+        300 * value,
+        30
+      );
+    });
+    // this.load.on("fileprogress", function (file) {
+    //   console.log(file.src);
+    // });
+    this.load.on("complete", function () {
+      console.log("complete");
+      progressBar.destroy();
+      progressBox.destroy();
+      loadingText.destroy();
+    });
   }
 
   create() {
-    // ================= MUSIC =================
     this.sound.stopAll();
-    // load song
-    const musicConfig = {
-      volume: 0.5,
-      loop: true,
-      delay: 3000,
-    };
-    this.music = this.sound.add("moaMusic", musicConfig);
-    this.music.play();
 
-    // ================= LIVES TEXT =================
-    // Lives (text)
-    WebFont.load({
-      google: {
-        families: ["Freckle Face", "Finger Paint", "Nosifer"],
-      },
-      active: () => {
-        this.livesText = this.add
-          .text(420, 50, "Lives: " + this.lives, {
-            fontFamily: "Freckle Face",
-            fontSize: 50,
-            color: "#ffffff",
-          })
-          .setShadow(2, 2, "#333333", 2, false, true);
-        this.livesText.setAlign("right");
-        this.livesText.setOrigin();
-        this.livesText.setScrollFactor(0);
-        this.livesText.setDepth(1005);
-      },
-    });
-    // Orbs (text)
-    WebFont.load({
-      google: {
-        families: ["Freckle Face", "Finger Paint", "Nosifer"],
-      },
-      active: () => {
-        this.dreamsText = this.add
-          .text(140, 50, "Dreams: " + this.dreamCount, {
-            fontFamily: "Freckle Face",
-            fontSize: 50,
-            color: "#ffffff",
-          })
-          .setShadow(2, 2, "#333333", 2, false, true);
-        this.dreamsText.setAlign("center");
-        this.dreamsText.setOrigin();
-        this.dreamsText.setScrollFactor(0);
-        this.dreamsText.setDepth(1005);
-      },
-    });
-
-    // ================= BACKGROUND LAYERS =================
-    this.backdrop = this.add.image(300, -5000, "bg1");
-    this.add.image(300, -3400, "bg2").setScrollFactor(0.8);
-    this.add.image(300, -3600, "bg3").setScrollFactor(0.9);
-    // this.add.image(300, -3400, "bg4").setScrollFactor(0.7);
-    this.add.image(300, -2700, "stars1").setScrollFactor(0.5).setScale(0.6);
-    this.add.image(300, -2800, "stars2").setScrollFactor(0.6).setScale(0.5);
-    this.planets = this.add.image(300, -5300, "planets").setScrollFactor(0.5);
-    this.add.image(350, -4720, "heavenCloudsBack").setScrollFactor(0.48);
+    // intro background
+    this.add.image(240, 320, "background").setScrollFactor(1, 0);
     this.add
-      .image(100, -5100, "heavenCloudsFront")
-      .setScrollFactor(0.52)
-      .setDepth(1002);
+      .tileSprite(
+        game.config.width / 2,
+        game.config.height / 2 + 500,
+        game.config.width,
+        3000,
+        "kowhaiwhai"
+      )
+      .setScrollFactor(0, 0.25)
+      .setAlpha(0.2)
+      .setScale(1);
 
-    console.log("this.backdrop", this.backdrop);
-    console.log("this.planets", this.planets);
-
-    // this.add
-    //   .tileSprite(
-    //     game.config.width / 2,
-    //     game.config.height / 2,
-    //     game.config.width,
-    //     3000,
-    //     "kowhaiwhai"
-    //   )
-    //   .setScrollFactor(0, 0.25)
-    //   .setAlpha(0.2)
-    //   .setScale(1);
-
-    // ================= PLATFORMS =================
-    this.platforms = this.physics.add.staticGroup();
-    this.clouds = this.physics.add.staticGroup();
-    // this.clouds = this.physics.add.group({
-    //   allowGravity: false,
-    //   immovable: true
-    // });
-
-    let firstPlatform = true;
-
-    // ================== PLATFORMS ==================
-    // then create 5 platforms from the group
-    for (let i = 0; i < 5; ++i) {
-      let x = Phaser.Math.Between(80, 400); //320
-      const y = 154 * i;
-      // const y = -10100 + Phaser.Math.Between(160, 170) * i;
-
-      // make sure first platform is below tane
-      if (i == 4 && firstPlatform == true) {
-        firstPlatform = false;
-        // middle of screen(ish)
-        x = game.config.width / 2 - 40;
-      }
-
-      /** @type {Phaser.Physics.Arcade.Sprite} */
-      const platform = this.platforms.create(x, y, "platform");
-      platform.scale = 0.2;
-      platform.setDepth(1004);
-
-      /** @type {Phaser.Physics.Arcade.StaticBody} */
-      const body = platform.body;
-      body.updateFromGameObject();
-    }
-    // ================== CLOUDS ==================
-    for (let i = 0; i < 5; ++i) {
-      const cloudNames = ["cloud1", "cloud2", "cloud3", "cloud4"];
-      let x = Phaser.Math.Between(80, 400); //320
-      let rand = Phaser.Math.Between(0, 3); //320
-      const y = -4000 + ( 154 * i);
-      // const y = -10100 + Phaser.Math.Between(160, 170) * i;
-
-      /** @type {Phaser.Physics.Arcade.Sprite} */
-      const cloud = this.clouds.create(x, y, cloudNames[rand]);
-      cloud.scale = 0.3;
-      cloud.body.setSize(cloud.width, 10).setOffset(0, cloud.height);
-      cloud.setDepth(1004);
-      /** @type {Phaser.Physics.Arcade.StaticBody} */
-      const body = cloud.body;
-      body.updateFromGameObject();
-    }
-
-    // this.cameras.main.scrollY = -8000
-    // this.cameras.main.scrollY = -10100;
-    // this.cameras.main.scrollY = -5500
-
-    // ================= PLAYER =================
-    this.player = this.physics.add
-      .sprite(240, 320, "taneIdle")
-
-    // this.player = this.physics.add.sprite(240, -10100, "taneIdle");
-
-    this.player.setDepth(1003);
-    this.player.body.setSize(30, 70).setOffset(50, 30);
-
-    this.physics.add.collider(this.platforms, this.player);
-    this.physics.add.collider(this.clouds, this.player);
-
-    // this.startPlatform = this.platforms.create(this.player.x, this.player.y + 120, "platform").setScale(0.2);
-    // const body = this.startPlatform.body;
-    // body.updateFromGameObject() ;
-
-    // this.cameras.main.startFollow(this.player);
-    this.cameras.main.setDeadzone(this.scale.width * 1.5);
-
-    //================ ANIMATIONS =================
-    this.anims.create({
-      key: "bee",
-      frames: [
-        {
-          key: "enemies",
-          frame: "bee.png",
-        },
-        {
-          key: "enemies",
-          frame: "bee_fly.png",
-        },
-      ],
-      frameRate: 8,
-      repeat: -1,
-    });
-    //coins anims
-    this.anims.create({
-      key: "blueCoin",
-      frames: [
-        { key: "blue-coin-1", frame: 0 },
-        { key: "blue-coin-2", frame: 0 },
-        { key: "blue-coin-3", frame: 0 },
-        { key: "blue-coin-4", frame: 0 },
-        { key: "blue-coin-5", frame: 0 },
-        { key: "blue-coin-6", frame: 0 },
-      ],
-      frameRate: 12,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "goldCoin",
-      frames: [
-        { key: "gold-coin-1", frame: 0 },
-        { key: "gold-coin-2", frame: 0 },
-        { key: "gold-coin-3", frame: 0 },
-        { key: "gold-coin-4", frame: 0 },
-        { key: "gold-coin-5", frame: 0 },
-        { key: "gold-coin-6", frame: 0 },
-      ],
-      frameRate: 12,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "silverCoin",
-      frames: [
-        { key: "silver-coin-1", frame: 0 },
-        { key: "silver-coin-2", frame: 0 },
-        { key: "silver-coin-3", frame: 0 },
-        { key: "silver-coin-4", frame: 0 },
-        { key: "silver-coin-5", frame: 0 },
-        { key: "silver-coin-6", frame: 0 },
-      ],
-      frameRate: 12,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "bronzeCoin",
-      frames: [
-        { key: "bronze-coin-1", frame: 0 },
-        { key: "bronze-coin-2", frame: 0 },
-        { key: "bronze-coin-3", frame: 0 },
-        { key: "bronze-coin-4", frame: 0 },
-        { key: "bronze-coin-5", frame: 0 },
-        { key: "bronze-coin-6", frame: 0 },
-      ],
-      frameRate: 12,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "taneRun",
-      frames: this.anims.generateFrameNumbers("taneRun", {
-        frames: [16, 17, 18, 19, 20, 21, 22, 23],
-      }),
-      frameRate: 15,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "taneIdle",
-      frames: this.anims.generateFrameNumbers("taneIdle", {
-        frames: [0, 1, 2],
-      }),
-      frameRate: 5,
-    });
-
-    this.anims.create({
-      key: "taneJump",
-      frames: this.anims.generateFrameNumbers("taneJump", {
-        frames: [12, 13, 14, 15],
-      }),
-      frameRate: 10,
-    });
+    // orb anitmation (for dialog 1)
     this.anims.create({
       key: "blueOrb",
       frames: "blueOrb",
       frameRate: 60,
       repeat: -1,
     });
-    this.anims.create({
-      key: "pinkOrb",
-      frames: "pinkOrb",
-      frameRate: 60,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "lightning",
-      frames: "lightning",
-      frameRate: 15,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "hiwa",
-      frames: "hiwa",
-      frameRate: 5,
-      repeat: -1,
-    });
+    // hiwa anitmation (for dialog 2)
     this.anims.create({
       key: "hiwa2",
       frames: "hiwa2",
@@ -648,471 +1137,149 @@ class Game extends Phaser.Scene {
       repeat: -1,
     });
 
-    this.anims.create({
-      key: "fireworksBlue",
-      frames: "fireworksBlue",
-      frameRate: 30,
-    });
-    this.anims.create({
-      key: "fireworksBlue2",
-      frames: "fireworksBlue2",
-      frameRate: 30,
-    });
-    this.anims.create({
-      key: "fireworksRocket",
-      frames: "fireworksRocket",
-      frameRate: 30,
-      repeat: -1,
-    });
-    // ================= hiwa =================
-    //
-    this.hiwa = this.physics.add
-      .sprite(300, -4990, "hiwa")
-      .setScrollFactor(0.5)
-      .setScale(1)
-      .setDepth(1001);
-    this.hiwa.immovable = true;
-    this.hiwa.body.moves = false;
-    this.hiwa.allowGravity = false;
-    this.hiwa.play("hiwa2");
+    // dialog ONE (Using rexUI)
+    this.dialog1 = this.rexUI.add
+      .dialog({
+        x: game.config.width / 2,
+        y: game.config.height / 2,
+        width: 200,
+        background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 10, 0x533d8e),
+        content: this.createLabel(
+          this,
+          "Collect as many dream orbs as you can",
+          20,
+          20
+        ),
+        description: this.add
+          .sprite({
+            x: 0,
+            y: 0,
+            key: "blueOrb",
+          })
+          .play("blueOrb")
+          .setDisplaySize(80, 80),
+        actions: [this.createLabel(this, "NEXT", 10, 10)],
+        space: {
+          left: 20,
+          right: 20,
+          top: 50,
+          bottom: 20,
+          content: 20,
+          toolbarItem: 5,
+          choice: 15,
+          action: 15,
+          description: 25,
+          descriptionLeft: 200,
+          descriptionRight: 200,
+        },
+        align: {
+          content: "center",
+          description: "center",
+          actions: "right", // 'center'|'left'|'right'
+        },
+        click: {
+          mode: "release",
+        },
+      })
+      .layout()
+      // .drawBounds(this.add.graphics(), 0xff0000)
+      .popUp(1000);
 
-    // ================= GROUPS =================
-    this.orbs = this.physics.add.group({
-      classType: Orb,
-      allowGravity: false,
-      immovable: true,
-    });
-    this.lightning = this.physics.add.group({
-      classType: Orb,
-      allowGravity: true,
-      immovable: false,
+    // dialog TWO
+    this.dialog2 = this.rexUI.add
+      .dialog({
+        x: game.config.width / 2,
+        y: game.config.height / 2,
+        width: 300,
+        background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x533d8e),
+        content: this.createLabel(
+          this,
+          "And deliver them to Hiwa-i-te-rangi \n to recieve a piece of your dream",
+          10,
+          10
+        ),
+        description: this.add.sprite(0, 0, "hiwa2").play("hiwa2"),
+        actions: [this.createLabel(this, "START GAME", 10, 10)],
+        space: {
+          left: 20,
+          right: 20,
+          top: 50,
+          bottom: 20,
+          content: 20,
+          toolbarItem: 5,
+          choice: 15,
+          action: 15,
+          descriptionLeft: 200,
+          descriptionRight: 200,
+        },
+        align: {
+          content: "center",
+          actions: "right", // 'center'|'left'|'right'
+        },
+        click: {
+          mode: "release",
+        },
+      })
+      .layout()
+      // .drawBounds(this.add.graphics(), 0xff0000)
+      .setVisible(false);
+
+    var tween = this.tweens.add({
+      targets: [this.dialog1, this.dialog2],
+      scaleX: 1,
+      scaleY: 1,
+      ease: "Bounce", // 'Cubic', 'Elastic', 'Bounce', 'Back'
+      duration: 1000,
+      repeat: 0, // -1: infinity
+      yoyo: false,
     });
 
-    // ================= DREAM ORBS =================
-    // create orbs
-    for (var x = 0; x < 10; x++) {
-      this.addOrb("blue");
-    }
-    for (var x = 0; x < 10; x++) {
-      this.addOrb("pink");
-    }
-
-    // ================= OVERLAPS =================
-    // this.physics.add.collider(this.platforms, this.orbs);
-    this.physics.add.overlap(
-      this.player,
-      this.orbs,
-      this.handleCollectOrb,
-      undefined,
+    this.dialog1.on(
+      "button.click",
+      function (button) {
+        if (button.text === "NEXT") {
+          this.dialog1.setVisible(false);
+          this.dialog2.setVisible(true).popUp(1000);
+        }
+      },
       this
     );
-    this.physics.add.overlap(
-      this.player,
-      this.lightning,
-      this.handleLightningStrike,
-      undefined,
+
+    this.dialog2.on(
+      "button.click",
+      function (button) {
+        if (button.text === "START GAME") {
+          console.log("starting game");
+          this.scene.start("game");
+          // this.scene.start("game-hud")
+        }
+      },
       this
     );
-  } // End of create()
-
-  update(t, dt) {
-    if (!this.player) {
-      return;
-    }
-
-    // rotate orbs
-    // this.orbs.children.iterate((orb) => {
-    //   console.log("orb",orb.x,orb.y)
-    //   Phaser.Actions.RotateAround(orb, {x: orb.x, y: orb.y }, 0.02);
-    // })
-    // Phaser.Actions.RotateAroundDistance(this.orbs.getChildren(), {   x: 250, y: -400 }, 0.02, 50);
-
-    // camera moving  up
-    if (this.cameras.main.scrollY > -11000) {
-      this.cameras.main.scrollY -= 1.5;
-    } else if (
-      this.cameras.main.scrollY <= -11000 &&
-      this.gameFinished == false
-    ) {
-      // ============= GAME FINISHED ==============
-      this.gameFinished = true;
-      console.log("game finished");
-
-      this.sound.play("cheer")
-
-      this.launchFireworks();
-      for (var i = 1; i < 10; i++) {
-        this.time.addEvent({
-          delay: i * 1000,
-          callback: this.launchFireworks,
-          callbackScope: this,
-        });
-      }
-
-      // this.time.addEvent({delay:2000, callback:this.launchFireworks,callbackScope:this});
-      // this.time.addEvent({delay:3000, callback:this.launchFireworks,callbackScope:this});
-      // this.time.addEvent({delay:4000, callback:this.launchFireworks,callbackScope:this});
-      // this.time.addEvent({delay:5000, callback:this.launchFireworks,callbackScope:this});
-    }
-
-    const scrollY = this.cameras.main.scrollY;
-
-    // ============= UPDATE PLATFORMS ==============
-    // stop placing platforms from -500 scrollY
-    if (scrollY < -3500 && this.platformsFinished == false) {
-      this.platformsFinished = true;
-      this.player.body.setOffset(50, 20);
-    } else if (this.platformsFinished == false) {
-      // update platforms
-      this.platforms.children.iterate((child) => {
-        /** @type {Phaser.Physics.Arcade.Sprite} */
-        const platform = child;
-
-        // add new platforms above once platforms disappear below bottom line.
-        if (platform.y >= scrollY + 750) {
-          // if platform is 750 below current scrollY
-          platform.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
-          platform.x = Phaser.Math.Between(0, game.config.width); // random new x position
-          platform.body.updateFromGameObject(); // update position
-          this.addLightningAbove(platform); // add Lightning
-        }
-      });
-    }
-    // ============= UPDATE CLOUDS ==============
-    if (this.platformsFinished == true) {
-      this.clouds.children.iterate((child) => {
-        const cloud = child;
-
-        // console.log('scrollY',scrollY," playerY",this.player.y);
-        // console.log('cloudY',cloud.y," limitY",scrollY + 750);
-        // add new clouds above once clouds disappear below bottom line.
-        if (cloud.y >= scrollY + 750) {
-          // if cloud is 750 below current scrollY
-          cloud.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
-          cloud.x = Phaser.Math.Between(0, game.config.width); // random new x position
-          cloud.body.updateFromGameObject(); // update position
-          this.addLightningAbove(cloud); // add Lightning
-        }
-      });
-    }
-
-    // update clouds
-
-    const touchingDown = this.player.body.touching.down;
-
-    if (touchingDown) {
-    }
-
-    const playerJump = -310;
-    const playerVelocity = 300;
-
-    // Control the player with left or right keys
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-playerVelocity);
-      if (this.player.body.onFloor()) {
-        this.player.play("taneRun", true);
-      }
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(playerVelocity);
-      if (this.player.body.onFloor()) {
-        this.player.play("taneRun", true);
-      }
-    } else {
-      // If no keys are pressed, the player keeps still
-      this.player.setVelocityX(0);
-      // Only show the idle animation if the player is footed
-      // If this is not included, the player would look idle while jumping
-      if (this.player.body.onFloor()) {
-        this.player.play("taneIdle", true);
-      }
-    }
-
-    // Player can jump while walking any direction by pressing the space bar
-    // or the 'UP' arrow
-    // === JUMP
-    // if ((this.cursors.space.isDown || this.cursors.up.isDown ) && this.player.body.onFloor() ) {
-    //   this.player.setVelocityY(-350);
-    //   this.player.play('jump', true);
-    // }
-    if (this.cursors.space.isDown && this.player.body.onFloor()) {
-      //player is on the ground, so he is allowed to start a jump
-      this.jumptimer = 1;
-      this.player.body.velocity.y = playerJump;
-      this.player.play("taneJump", false);
-
-      // Jump sounds
-      // this.sound.play("jump1");
-      const random = Phaser.Math.Between(1, 9);
-      switch (random) {
-        case 1:
-          this.sound.play("maleJump1");
-          break;
-        case 2:
-          this.sound.play("maleJump2");
-          break;
-        case 3:
-          this.sound.play("maleJump3");
-          break;
-        case 4:
-          this.sound.play("maleJump4");
-          break;
-        case 5:
-          this.sound.play("maleJump5");
-          break;
-        case 6:
-          this.sound.play("maleJump6");
-          break;
-        case 7:
-          this.sound.play("maleJump7");
-          break;
-        case 8:
-          this.sound.play("maleJump8");
-          break;
-        case 9:
-          this.sound.play("maleJump9");
-          break;
-        default:
-          return;
-      }
-    } else if (this.cursors.space.isDown && this.jumptimer != 0) {
-      //player is no longer on the ground, but is still holding the jump key
-      if (this.jumptimer > 30) {
-        // player has been holding jump for over 30 frames, it's time to stop him
-        this.jumptimer = 0;
-        // this.player.play('taneJump', false);
-      } else {
-        // player is allowed to jump higher (not yet 30 frames of jumping)
-        this.jumptimer++;
-        this.player.body.velocity.y = playerJump;
-        // this.player.play('taneJump', false);
-      }
-    } else if (this.jumptimer != 0) {
-      //reset this.jumptimer since the player is no longer holding the jump key
-      this.jumptimer = 0;
-      // this.player.play('taneJump', false);
-    }
-
-    // flip player
-    if (this.player.body.velocity.x > 0) {
-      this.player.setFlipX(true);
-    } else if (this.player.body.velocity.x < 0) {
-      // otherwise, make them face the other side
-      this.player.setFlipX(false);
-    }
-
-    this.horizontalWrap(this.player);
-
-    const bottomPlatform = this.findBottomMostPlatform(this.platformsFinished);
-    console.log("bottom platform:", bottomPlatform.y);
-
-    // death by falling
-    if (this.player.y > bottomPlatform.y + 500) {
-      console.log("you were too slow and bottom caught ya. you died.");
-      this.deathBy = "falling";
-      this.scene.start("game-over", { deathBy: this.deathBy });
-    }
   }
-
-  findBottomMostPlatform(platformsFinished) {
-    // console.log('got bottom');
-    let platforms = null;
-    if (platformsFinished == false) {
-      platforms = this.platforms.getChildren();
-    } else if (platformsFinished) {
-      platforms = this.clouds.getChildren();
-    }
-
-    let bottomPlatform = platforms[0];
-
-    for (let i = 1; i < platforms.length; ++i) {
-      const platform = platforms[i];
-
-      // discard any platforms that are above current
-      if (platform.y < bottomPlatform.y) {
-        continue;
-      }
-
-      bottomPlatform = platform;
-    }
-    // console.log('bottom platform',bottomPlatform);
-
-    return bottomPlatform;
-  }
-
-  /**
-   *
-   * @param {Phaser.GameObjects.Sprite} sprite
-   */
-  horizontalWrap(sprite) {
-    const halfWidth = sprite.displayWidth * 0.5;
-    const gameWidth = this.scale.width;
-    if (sprite.x < -halfWidth) {
-      sprite.x = gameWidth + halfWidth;
-    } else if (sprite.x > gameWidth + halfWidth) {
-      sprite.x = -halfWidth;
-    }
-  }
-
-  /**
-   *
-   * @param {Phaser.GameObjects.Sprite} sprite
-   */
-
-  addLightningAbove(sprite) {
-    // set token y position
-    // const y = sprite.y - sprite.displayHeight;
-    const y = sprite.y;
-    const lightning = this.lightning.get(sprite.x, y, "lightning");
-    lightning.setScale(2);
-    lightning.setActive(true);
-    lightning.setVisible(true);
-    this.add.existing(lightning);
-    lightning.body
-      .setSize(lightning.width / 10, lightning.height - 30)
-      .setOffset(17, 30);
-    lightning.setDepth(1004);
-    // lightning.play("goldCoin", true);
-    lightning.play("lightning", true);
-    const random = Phaser.Math.Between(1, 2);
-    console.log("lightning random:", random);
-    if (random == 1) {
-      this.sound.play("lightning1");
-    } else if (random == 2) {
-      this.sound.play("lightning2");
-    }
-    // this.physics.world.enable(lightning);
-    return lightning;
-  }
-  addOrb(colour) {
-    // set token y position
-    // const y = sprite.y - sprite.displayHeight;
-    const x = Phaser.Math.Between(1, 540);
-    const y = Phaser.Math.Between(-10000, 0);
-    // get random number to determine which token to randomly place
-    const random = Phaser.Math.Between(1, 2);
-
-    switch (colour) {
-      case "blue":
-        const blueOrb = this.orbs.get(x, y, "blueOrb");
-        blueOrb.setScale(2);
-        blueOrb.setActive(true);
-        blueOrb.setVisible(true);
-        this.add.existing(blueOrb);
-        blueOrb.body.setSize(blueOrb.width / 2, blueOrb.height / 2);
-        // blueOrb.play("goldCoin", true);
-        blueOrb.play("blueOrb");
-        // this.physics.world.enable(blueOrb);
-        return blueOrb;
-        break;
-      case "pink":
-        const pinkOrb = this.orbs.get(x, y, "pinkOrb");
-        pinkOrb.setScale(2);
-        pinkOrb.setActive(true);
-        pinkOrb.setVisible(true);
-        this.add.existing(pinkOrb);
-        pinkOrb.body.setSize(pinkOrb.width / 2, pinkOrb.height / 2);
-        // pinkOrb.play("silverCoin", true);
-        pinkOrb.play("pinkOrb");
-        // this.physics.world.enable(pinkOrb);
-        return pinkOrb;
-        break;
-      default:
-        return;
-    }
-  }
-
-  /**
-   *
-   * @param {Phaser.Physics.Arcade.Sprite} player
-   * @param {Orb} orb
-   */
-  handleLightningStrike() {
-    console.log("you got zapped!");
-    this.lives--;
-    if (this.lives <= 1) {
-      this.deathBy = "lightning";
-      this.scene.start("game-over", { deathBy: this.deathBy });
-    }
-  }
-
-  handleCollectOrb(player, orb) {
-    // if (this.lives <= 1) {
-    //   this.scene.start("game-over");
-    //   // this.sound.play("die");
-    // }
-
-    // remove touched token
-    this.orbs.killAndHide(orb);
-    this.physics.world.disableBody(orb.body);
-
-    this.dreamCount++;
-    this.sound.play("powerup");
-    this.dreamsText.setText(`Dreams: ${this.dreamCount}`);
-  }
-
-  launchFireworks() {
-    this.sound.play("fireworksSound");
-    const bottomOfScreen = -11000 + 740;
-    const rand1x = Phaser.Math.Between(0, game.config.width);
-    const rand1y = Phaser.Math.Between(300, 740);
-    const rand2x = Phaser.Math.Between(0, game.config.width);
-    const rand2y = Phaser.Math.Between(300, 740);
-    const fireworks = this.add
-      .sprite(rand1x, bottomOfScreen, "fireworksRocket")
-      .setDepth(1005);
-    const fireworks1 = this.add
-      .sprite(rand2x, bottomOfScreen, "fireworksRocket")
-      .setDepth(1005);
-    fireworks.play("fireworksRocket");
-    this.tweens
-      .add({
-        targets: fireworks,
-        y: bottomOfScreen - rand1y,
-        duration: 2000,
-        ease: "Power2",
-      })
-      .on("complete", (anim, frame) => {
-        fireworks.setScale(2);
-        fireworks.play("fireworksBlue");
-      });
-    this.tweens
-      .add({
-        targets: fireworks1,
-        y: bottomOfScreen - rand2y,
-        duration: 2500,
-        ease: "Power2",
-      })
-      .on("complete", (anim, frame) => {
-        fireworks1.setScale(2);
-        fireworks1.play("fireworksBlue");
-      });
-  }
-
-  moveHero(e) {
-    // set hero velocity according to input horizontal coordinate
-    this.player.setVelocityX(
-      gameOptions.heroSpeed * (e.x > game.config.width / 2 ? 1 : -1)
-    );
-
-    // keyboard controller
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-300);
-      this.player.play("taneRun");
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(300);
-      this.player.play("taneRun");
-    } else {
-      this.player.play("taneIdle", true);
-    }
-  }
-
-  // method to stop the hero
-  stopHero() {
-    // ... just stop the hero :)
-    this.player.setVelocityX(0);
+  // settings for the dialog labels
+  createLabel(scene, text, spaceTop, spaceBottom) {
+    return scene.rexUI.add.label({
+      width: 40, // Minimum width of round-rectangle
+      height: 40, // Minimum height of round-rectangle
+      background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x8f80b6),
+      text: scene.add
+        .text(0, 0, text, {
+          fontFamily: "Freckle Face",
+          fontSize: "24px",
+          color: "#ffffff",
+        })
+        .setShadow(2, 2, "#333333", 2, false, true)
+        .setAlign("center"),
+      space: {
+        left: 10,
+        right: 10,
+        top: spaceTop,
+        bottom: spaceBottom,
+      },
+    });
   }
 }
-
 class GameOver extends Phaser.Scene {
   constructor() {
     super("game-over");
