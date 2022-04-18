@@ -81,11 +81,27 @@ class Game extends Phaser.Scene {
   }
 
   preload() {
-     //  Load the Google WebFont Loader script
-     this.load.script(
+    //  Load the Google WebFont Loader script
+    this.load.script(
       "webfont",
       "//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"
     );
+
+    // load dialog plugin
+    this.load.scenePlugin(
+      "rexuiplugin",
+      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js",
+      "rexUI",
+      "rexUI"
+    );
+
+    // load font plugin
+    this.plugins.get("rexwebfontloaderplugin").addToScene(this);
+    this.load.rexWebFont({
+      google: {
+        families: ["Freckle Face", "Finger Paint", "Nosifer"],
+      },
+    });
 
     this.cursors = this.input.keyboard.createCursorKeys();
   }
@@ -130,7 +146,7 @@ class Game extends Phaser.Scene {
       },
       active: () => {
         this.dreamsText = this.add
-          .text(game.config.width/2, 50, "Dreams: " + this.dreamCount, {
+          .text(game.config.width / 2, 50, "Dreams: " + this.dreamCount, {
             fontFamily: "Freckle Face",
             fontSize: 50,
             color: "#ffffff",
@@ -164,7 +180,7 @@ class Game extends Phaser.Scene {
     let firstPlatform = true;
 
     // ================== FOR TESTING ==================
-    const startGameAtForTesting = -10100
+    const startGameAtForTesting = -10100;
     // this.cameras.main.scrollY = startGameAtForTesting;
 
     // ================== PLATFORMS ==================
@@ -196,9 +212,9 @@ class Game extends Phaser.Scene {
       let x = Phaser.Math.Between(80, 400); //320
       let y = -4000 + 154 * i;
       // let y = startGameAtForTesting + Phaser.Math.Between(160, 170) * i;
-      
+
       // random number between 0 & 3 for cloud image to be used
-      let rand = Phaser.Math.Between(0, 3); 
+      let rand = Phaser.Math.Between(0, 3);
       const cloudNames = ["cloud1", "cloud2", "cloud3", "cloud4"];
 
       // create cloud platform
@@ -211,7 +227,11 @@ class Game extends Phaser.Scene {
 
     // ================= PLAYER =================
     this.player = this.physics.add.sprite(240, 320, "taneIdle");
-    // this.player = this.physics.add.sprite(240, startGameAtForTesting, "taneIdle");
+    // this.player = this.physics.add.sprite(
+    //   240,
+    //   startGameAtForTesting,
+    //   "taneIdle"
+    // );
 
     this.player.setDepth(1003);
     this.player.body.setSize(30, 70).setOffset(50, 30);
@@ -276,6 +296,11 @@ class Game extends Phaser.Scene {
       repeat: -1,
     });
     this.anims.create({
+      key: "hiwaGive",
+      frames: "hiwaGive",
+      frameRate: 5,
+    });
+    this.anims.create({
       key: "fireworksBlue",
       frames: "fireworksBlue",
       frameRate: 30,
@@ -291,13 +316,19 @@ class Game extends Phaser.Scene {
       frameRate: 30,
       repeat: -1,
     });
+    this.anims.create({
+      key: "dreamDiamond",
+      frames: "dreamDiamond",
+      frameRate: 15,
+      repeat: -1,
+    });
 
     // ================= hiwa =================
     this.hiwa = this.physics.add
-      .sprite(300, -4990, "hiwa")
+      .sprite(game.config.width/2+20, -4990, "hiwa")
       .setScrollFactor(0.5)
       .setScale(1)
-      .setDepth(1001);
+      .setDepth(1001)
     this.hiwa.immovable = true;
     this.hiwa.body.moves = false;
     this.hiwa.allowGravity = false;
@@ -313,6 +344,11 @@ class Game extends Phaser.Scene {
       classType: Orb,
       allowGravity: true,
       immovable: false,
+    });
+    this.dreamPiece = this.physics.add.group({
+      classType: Orb,
+      allowGravity: false,
+      immovable: true,
     });
 
     // ================= DREAM ORBS =================
@@ -353,13 +389,53 @@ class Game extends Phaser.Scene {
       this.cameras.main.scrollY <= -11000 &&
       this.gameFinished == false
     ) {
-      // ============= GAME FINISHED ==============
+      /* ==============================
+            *** GAME FINISHED ***
+         ============================== */
       this.gameFinished = true;
       console.log("game finished");
 
       this.sound.play("cheer");
 
+      //================= CONGRATS TEXT =================
+      this.dreamsText.setVisible(false)
+      WebFont.load({
+        google: {
+          families: ["Freckle Face", "Finger Paint", "Nosifer"],
+        },
+        active: () => {
+          this.endText = this.add
+            .text(game.config.width/2, 150, "Nga mihi Tane!\nFor delivering the dreams to me,\nI will give you another\npiece of your dream.", {
+              fontFamily: "Freckle Face",
+              fontSize: 30,
+              color: "#ffffff",
+              backgroundColor: "#533d8e",
+              padding: 10,
+            })
+            .setShadow(2, 2, "#333333", 2, false, true);
+          this.endText.setAlign("center");
+          this.endText.setOrigin();
+          this.endText.setScrollFactor(0);
+          this.endText.setDepth(1005);
+        },
+      });
+
+
+      //================= HIWA'S KOHA =================
+      this.hiwa.play("hiwaGive")
+      this.hiwa.on('animationcomplete', function(animation) {
+        if(animation.key === 'hiwaGive')
+        this.dream = this.dreamPiece.get(game.config.width/2+7,-11000+(740/2-20),"dreamDiamond").setDepth(1006).play("dreamDiamond").setScale(0.4)
+        this.sound.play("dreamSound")
+      }, this);
+      
+      // this.dream.body.setSize(200, 200)
+      // this.orbs.get(x, y, "pinkOrb");
+
+      //================= FIREWORKS =================
+      
       this.launchFireworks();
+      // launch fireworks to the amount of dreams collected
       for (var i = 1; i < this.dreamCount; i++) {
         this.time.addEvent({
           delay: i * 1000,
@@ -367,6 +443,28 @@ class Game extends Phaser.Scene {
           callbackScope: this,
         });
       }
+      // after fireworks - hiwa gives dream piece
+
+      //
+     
+    }
+    else if (
+      this.cameras.main.scrollY <= -11000
+    ) {
+
+      
+      // this.blueOrb.x =this.follower.vec.x
+      // this.blueOrb.y =this.follower.vec.y
+      
+      // this.graphics.lineStyle(1, 0xffffff, 1);
+
+      // this.track.draw(this.graphics);
+
+    // this.track.getPoint(this.follower.t, this.follower.vec);
+
+    // graphics.fillStyle(0xff0000, 1);
+    // graphics.fillCircle(path.vec.x, path.vec.y, 8);
+    // this.blueOrb.setPosition(this.follower.vec.x, this.follower.vec.y);
     }
 
     // ============= UPDATE PLATFORMS ==============
@@ -406,7 +504,7 @@ class Game extends Phaser.Scene {
         }
       });
     }
-    
+
     const playerJump = -310;
     const playerVelocity = 300;
 
@@ -418,13 +516,13 @@ class Game extends Phaser.Scene {
         this.player.play("taneRun", true);
       }
     }
-    // ---- Right control ---- 
+    // ---- Right control ----
     else if (this.cursors.right.isDown) {
       this.player.setVelocityX(playerVelocity);
       if (this.player.body.onFloor()) {
         this.player.play("taneRun", true);
       }
-    } 
+    }
     // ---- Idle ----
     else {
       // If no keys are pressed, the player keeps still
@@ -474,7 +572,7 @@ class Game extends Phaser.Scene {
         default:
           return;
       }
-    } 
+    }
     // Jump hold
     else if (this.cursors.space.isDown && this.jumptimer != 0) {
       //player is no longer on the ground, but is still holding the jump key
@@ -505,7 +603,6 @@ class Game extends Phaser.Scene {
     // ability to wrap around sides (walk all the right and appear again on the left)
     this.horizontalWrap(this.player);
 
-
     // ============= DEATH BY FALLING ==============
     // get bottom most platform
     const bottomPlatform = this.findBottomMostPlatform(this.platformsFinished);
@@ -516,7 +613,7 @@ class Game extends Phaser.Scene {
       // player died
       this.scene.start("game-over", { deathBy: this.deathBy });
     }
-  }// End of update()
+  } // End of update()
 
   // ============= CUSTOM FUNCTIONS ==============
   moveHero(e) {
@@ -576,10 +673,10 @@ class Game extends Phaser.Scene {
 
   addLightningAbove(sprite) {
     const y = sprite.y;
-    const randomX = Phaser.Math.Between(50, game.config.width-50);
+    const randomX = Phaser.Math.Between(50, game.config.width - 50);
     // const lightning = this.lightning.get(sprite.x, y, "lightning");
     const lightning = this.lightning.get(randomX, y, "lightning");
-    lightning.setOrigin(0,0);
+    lightning.setOrigin(0, 0);
     lightning.setScale(2);
     lightning.setActive(true);
     lightning.setVisible(true);
@@ -614,6 +711,7 @@ class Game extends Phaser.Scene {
         this.add.existing(blueOrb);
         blueOrb.body.setSize(blueOrb.width / 2, blueOrb.height / 2);
         blueOrb.play("blueOrb");
+        blueOrb.setDepth(1005)
         return blueOrb;
         break;
       case "pink":
@@ -624,6 +722,7 @@ class Game extends Phaser.Scene {
         this.add.existing(pinkOrb);
         pinkOrb.body.setSize(pinkOrb.width / 2, pinkOrb.height / 2);
         pinkOrb.play("pinkOrb");
+        pinkOrb.setDepth(1005)
         return pinkOrb;
         break;
       default:
@@ -655,10 +754,10 @@ class Game extends Phaser.Scene {
     const rand2y = Phaser.Math.Between(300, 740);
     const fireworks = this.add
       .sprite(rand1x, bottomOfScreen, "fireworksRocket")
-      .setDepth(1005);
+      .setDepth(1006);
     const fireworks1 = this.add
       .sprite(rand2x, bottomOfScreen, "fireworksRocket")
-      .setDepth(1005);
+      .setDepth(1006);
     fireworks.play("fireworksRocket");
     this.tweens
       .add({
@@ -684,6 +783,28 @@ class Game extends Phaser.Scene {
       });
   }
 
+  // settings for the dialog labels
+  createLabel(scene, text, spaceTop, spaceBottom) {
+    return scene.rexUI.add.label({
+      width: 40, // Minimum width of round-rectangle
+      height: 40, // Minimum height of round-rectangle
+      background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x8f80b6),
+      text: scene.add
+        .text(0, 0, text, {
+          fontFamily: "Freckle Face",
+          fontSize: "24px",
+          color: "#ffffff",
+        })
+        .setShadow(2, 2, "#333333", 2, false, true)
+        .setAlign("center"),
+      space: {
+        left: 10,
+        right: 10,
+        top: spaceTop,
+        bottom: spaceBottom,
+      },
+    });
+  }
 }
 
 var sceneConfig = {
@@ -696,11 +817,11 @@ var sceneConfig = {
         url: "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexwebfontloaderplugin.min.js",
         start: true,
       },
-        {
-          type: "image",
-          key: "tc-logo",
-          url: "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/all%20white.png?v=1649980778495",
-        },
+      {
+        type: "image",
+        key: "tc-logo",
+        url: "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/all%20white.png?v=1649980778495",
+      },
     ],
   },
 };
@@ -736,7 +857,9 @@ class GameIntro extends Phaser.Scene {
 
     loadingText.setOrigin(0.5, 0.5);
     madeByText.setOrigin(0.5, 0.5);
-    this.add.image(width / 2, height / 2 + 125, "tc-logo").setDisplaySize(250,250);
+    this.add
+      .image(width / 2, height / 2 + 125, "tc-logo")
+      .setDisplaySize(250, 250);
     var progressBar = this.add.graphics();
     var progressBox = this.add.graphics();
     progressBox.fillStyle(0x222222, 0.8);
@@ -793,8 +916,6 @@ class GameIntro extends Phaser.Scene {
       "tc-logo",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/all%20white.png?v=1649980778495"
     );
-
-    
 
     this.load.image(
       "kowhaiwhai",
@@ -990,6 +1111,10 @@ class GameIntro extends Phaser.Scene {
       "fireworksSound",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/fireworks.wav?v=1649910586351"
     );
+    this.load.audio(
+      "dreamSound",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/dream-sound.wav?v=1650243851542"
+    );
 
     // TANE !!! (From Ariki Creative)
     this.load.spritesheet(
@@ -1058,6 +1183,14 @@ class GameIntro extends Phaser.Scene {
       }
     );
     this.load.spritesheet(
+      "hiwaGive",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/hiwa-spritesheet-give.png?v=1650235363845",
+      {
+        frameWidth: 128,
+        frameHeight: 128,
+      }
+    );
+    this.load.spritesheet(
       "fireworksBlue",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Explosion_Crystals_Blue-sheet.png?v=1649907669760",
       {
@@ -1081,9 +1214,17 @@ class GameIntro extends Phaser.Scene {
         frameHeight: 52,
       }
     );
+    this.load.spritesheet(
+      "dreamDiamond",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/dream-piece.png?v=1650241420024",
+      {
+        frameWidth: 480,
+        frameHeight: 480,
+      }
+    );
 
-     // Pre-loader
-     this.load.on("progress", function (value) {
+    // Pre-loader
+    this.load.on("progress", function (value) {
       console.log(value);
       progressBar.clear();
       progressBar.fillStyle(0xffffff, 1);
