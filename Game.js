@@ -384,7 +384,7 @@ class Game extends Phaser.Scene {
 
     //  ============= CAMERA CHASER (camera moving up) ==============
     if (this.cameras.main.scrollY > -11000) {
-      this.cameras.main.scrollY -= 1.5;
+      this.cameras.main.scrollY -= 1.2;
     } else if (
       this.cameras.main.scrollY <= -11000 &&
       this.gameFinished == false
@@ -672,10 +672,13 @@ class Game extends Phaser.Scene {
   }
 
   addLightningAbove(sprite) {
+    const randomLightning = Phaser.Math.Between(1, 3);
+    if (randomLightning !== 3) return 
     const y = sprite.y;
     const randomX = Phaser.Math.Between(50, game.config.width - 50);
     // const lightning = this.lightning.get(sprite.x, y, "lightning");
     const lightning = this.lightning.get(randomX, y, "lightning");
+    // lightning.body.velocity.setTo(0, 100);
     lightning.setOrigin(0, 0);
     lightning.setScale(2);
     lightning.setActive(true);
