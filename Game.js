@@ -181,14 +181,14 @@ class Game extends Phaser.Scene {
 
     // ================== FOR TESTING ==================
     const startGameAtForTesting = -10100;
-    this.cameras.main.scrollY = startGameAtForTesting;
+    // this.cameras.main.scrollY = startGameAtForTesting;
 
     // ================== PLATFORMS ==================
     // then create 5 platforms from the group
     for (let i = 0; i < 5; ++i) {
       let x = Phaser.Math.Between(80, 400); //320
-      // const y = 154 * i;
-      const y = startGameAtForTesting + Phaser.Math.Between(160, 170) * i;
+      const y = 154 * i;
+      // const y = startGameAtForTesting + Phaser.Math.Between(160, 170) * i;
 
       // make sure first platform is below tane - middle of screen(ish)
       if (i == 4 && firstPlatform == true) {
@@ -210,8 +210,8 @@ class Game extends Phaser.Scene {
     for (let i = 0; i < 5; ++i) {
       // cloud x y positions
       let x = Phaser.Math.Between(80, 400); //320
-      // let y = -4000 + 154 * i;
-      let y = startGameAtForTesting + Phaser.Math.Between(160, 170) * i;
+      let y = -4000 + 154 * i;
+      // let y = startGameAtForTesting + Phaser.Math.Between(160, 170) * i;
 
       // random number between 0 & 3 for cloud image to be used
       let rand = Phaser.Math.Between(0, 3);
@@ -226,12 +226,12 @@ class Game extends Phaser.Scene {
     }
 
     // ================= PLAYER =================
-    // this.player = this.physics.add.sprite(240, 320, "taneIdle");
-    this.player = this.physics.add.sprite(
-      240,
-      startGameAtForTesting,
-      "taneIdle"
-    );
+    this.player = this.physics.add.sprite(240, 320, "taneIdle");
+    // this.player = this.physics.add.sprite(
+    //   240,
+    //   startGameAtForTesting,
+    //   "taneIdle"
+    // );
 
     this.player.setDepth(1003);
     this.player.body.setSize(30, 70).setOffset(50, 30);
