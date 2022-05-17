@@ -1,12 +1,8 @@
-Tane Jump
+Tāne Ascent
 =================
 
-Following the Bunny Jump tutorial from Ourcade
+Help Tāne to collect the dreams, and deliver them to Hiwa-i-te-rangi.
 
+Game develop by Tai Collective for Te Tihi's app Te Mauri Moemoeā
 
-[Ourcade Bunny Jump Tutorial](https://ourcade.co/books/infinite-jumper-phaser3/).
-
-
--------------------
-
-\ ゜o゜)ノ
+Code inspired by [Ourcade Tutorial](https://ourcade.co/books/infinite-jumper-phaser3/).
