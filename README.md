@@ -10,8 +10,8 @@ Help Tāne to collect the dreams, and deliver them to Hiwa-i-te-rangi.
 Game develop by Tai Collective for Te Tihi's app Te Mauri Moemoeā
 
 Tai Collective developers that worked on Tāne Ascent:
-[@olioni](https://github.com/@olioni)
-[@tairea](https://github.com/@tairea)
+[@olioni](https://github.com/olioni)
+[@tairea](https://github.com/tairea)
 
 
 ![Tāne Ascent screenshot1](https://github.com/taicollective/tane-ascent/blob/main/screenshot1.png?raw=true)
