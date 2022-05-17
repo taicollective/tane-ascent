@@ -3,7 +3,7 @@ Tāne Ascent
 
 Live game: [https://celin-aroha-tane-ascent.glitch.me/](https://celin-aroha-tane-ascent.glitch.me/)
 
-=================
+------------
 
 Help Tāne to collect the dreams, and deliver them to Hiwa-i-te-rangi.
 
