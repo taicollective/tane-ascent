@@ -52,6 +52,102 @@ window.onload = function () {
   window.focus();
 };
 
+/**
+ * ControlsSprite
+ */
+class ControlsSprite extends Phaser.GameObjects.Image {
+  constructor(scene, x, y, config) {
+      super(scene, y, x, 'controls');
+      scene.add.existing(this);
+      this.setX(x)
+          .setY(y)
+          .setAlpha(0.1)
+          .setRotation(config.rotation)
+          .setScrollFactor(0)
+          .setScale(0.5);
+      this.type = config.type;
+      // hide control on non-touch devices
+      if (!scene.sys.game.device.input.touch)
+          this.setAlpha(0);
+  }
+}
+
+/**
+ * Controls
+ */
+class Controls {
+  constructor(scene) {
+      this.buttons = {};
+      this._width = 96;
+      this._height = 96;
+      this._scene = scene;
+      this._config = [
+          {
+              type: 'left',
+              rotation: 1.5 * Math.PI
+          },
+          {
+              type: 'right',
+              rotation: 0.5 * Math.PI
+          },
+          {
+              type: 'up',
+              rotation: 0
+          }
+      ];
+      this._config.forEach(el => {
+          this.buttons[el.type] = new ControlsSprite(scene, 0, 0, el);
+      });
+  }
+  adjustPositions() {
+      let width = this._scene.cameras.main.width;
+      let height = this._scene.cameras.main.height;
+      this.buttons.left.x = 70;
+      this.buttons.left.y = height - 70;
+      this.buttons.right.x = 70 + 90 + 45;
+      this.buttons.right.y = height - 70;
+      this.buttons.up.x = width - 70;
+      this.buttons.up.y = height - 70;
+  }
+  update() {
+      this.leftIsDown = false;
+      this.rightIsDown = false;
+      this.upIsDown = false;
+      let pointers = [];
+      if (this._scene.input.pointer1 != null) {
+        pointers.push(this._scene.input.pointer1);
+      }
+      if (this._scene.input.pointer2 != null) {
+        pointers.push(this._scene.input.pointer2);
+      }
+      let buttons = [this.buttons.left, this.buttons.right, this.buttons.up];
+      // check which pointer pressed which button
+      pointers.forEach(pointer => {
+          if (pointer.isDown) {
+              console.log(pointer.x, pointer.y);
+              let hit = buttons.filter(btn => {
+                  let x = btn.x - this._width / 2 < pointer.x && btn.x + this._width / 2 > pointer.x;
+                  let y = btn.y - this._height / 2 < pointer.y && btn.y + this._height / 2 > pointer.y;
+                  return x && y;
+              });
+              if (hit.length === 1) {
+                  switch (hit[0].type) {
+                      case 'left':
+                          this.leftIsDown = true;
+                          break;
+                      case 'right':
+                          this.rightIsDown = true;
+                          break;
+                      case 'up':
+                          this.upIsDown = true;
+                          break;
+                  }
+              }
+          }
+      });
+  }
+}
+
 /* =========================================
             MAIN GAME SCENE
 =========================================*/
@@ -201,6 +297,9 @@ class Game extends Phaser.Scene {
       platform.scale = 0.2;
       platform.setDepth(1004);
       platform.body.updateFromGameObject();
+
+      this.controls = new Controls(this);
+      this.controls.adjustPositions();
     }
 
     // this.startPlatform = this.platforms.create(this.player.x, this.player.y + 120, "platform").setScale(0.2);
@@ -509,15 +608,17 @@ class Game extends Phaser.Scene {
     const playerVelocity = 300;
 
     // ============= PLAYER CONTROLS ==============
+    this.controls.update();
+
     // ---- Left control ----
-    if (this.cursors.left.isDown) {
+    if ((this.cursors.left.isDown || this.controls.leftIsDown)) {
       this.player.setVelocityX(-playerVelocity);
       if (this.player.body.onFloor()) {
         this.player.play("taneRun", true);
       }
     }
     // ---- Right control ----
-    else if (this.cursors.right.isDown) {
+    else if ((this.cursors.right.isDown || this.controls.rightIsDown)) {
       this.player.setVelocityX(playerVelocity);
       if (this.player.body.onFloor()) {
         this.player.play("taneRun", true);
@@ -533,7 +634,7 @@ class Game extends Phaser.Scene {
       }
     }
     // ---- Jump control ----
-    if (this.cursors.space.isDown && this.player.body.onFloor()) {
+    if ((this.cursors.space.isDown || this.controls.upIsDown) && this.player.body.onFloor()) {
       //player is on the ground, so he is allowed to start a jump
       this.jumptimer = 1;
       this.player.body.velocity.y = playerJump;
@@ -574,7 +675,7 @@ class Game extends Phaser.Scene {
       }
     }
     // Jump hold
-    else if (this.cursors.space.isDown && this.jumptimer != 0) {
+    else if ((this.cursors.space.isDown || this.controls.upIsDown) && this.jumptimer != 0) {
       //player is no longer on the ground, but is still holding the jump key
       if (this.jumptimer > 30) {
         // player has been holding jump for over 30 frames, it's time to stop him
@@ -623,10 +724,10 @@ class Game extends Phaser.Scene {
     );
 
     // keyboard controller
-    if (this.cursors.left.isDown) {
+    if ((this.cursors.left.isDown || this.controls.leftIsDown)) {
       this.player.setVelocityX(-300);
       this.player.play("taneRun");
-    } else if (this.cursors.right.isDown) {
+    } else if ((this.cursors.right.isDown || this.controls.rightIsDown)) {
       this.player.setVelocityX(300);
       this.player.play("taneRun");
     } else {
@@ -1010,6 +1111,10 @@ class GameIntro extends Phaser.Scene {
     this.load.image(
       "tane-jump",
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Ftane-back-jump.png?v=1603605921264"
+    );
+    this.load.image(
+      "controls",
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/controls.png?v=1652917774226"
     );
 
     // Audio
