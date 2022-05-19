@@ -34,7 +34,7 @@ window.onload = function () {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       parent: "thegame",
       width: 540,
-      height: 720,
+      height: 960,
     },
     physics: {
       default: "arcade",
@@ -57,18 +57,18 @@ window.onload = function () {
  */
 class ControlsSprite extends Phaser.GameObjects.Image {
   constructor(scene, x, y, config) {
-      super(scene, y, x, 'controls');
-      scene.add.existing(this);
-      this.setX(x)
-          .setY(y)
-          .setAlpha(0.1)
-          .setRotation(config.rotation)
-          .setScrollFactor(0)
-          .setScale(0.5);
-      this.type = config.type;
-      // hide control on non-touch devices
-      if (!scene.sys.game.device.input.touch)
-          this.setAlpha(0);
+    super(scene, y, x, 'controls');
+    scene.add.existing(this);
+    this.setX(x)
+      .setY(y)
+      .setAlpha(0.1)
+      .setRotation(config.rotation)
+      .setScrollFactor(0)
+      .setScale(0.5);
+    this.type = config.type;
+    // hide control on non-touch devices
+    if (!scene.sys.game.device.input.touch)
+      this.setAlpha(0);
   }
 }
 
@@ -77,74 +77,74 @@ class ControlsSprite extends Phaser.GameObjects.Image {
  */
 class Controls {
   constructor(scene) {
-      this.buttons = {};
-      this._width = 96;
-      this._height = 96;
-      this._scene = scene;
-      this._config = [
-          {
-              type: 'left',
-              rotation: 1.5 * Math.PI
-          },
-          {
-              type: 'right',
-              rotation: 0.5 * Math.PI
-          },
-          {
-              type: 'up',
-              rotation: 0
-          }
-      ];
-      this._config.forEach(el => {
-          this.buttons[el.type] = new ControlsSprite(scene, 0, 0, el);
-      });
+    this.buttons = {};
+    this._width = 96;
+    this._height = 96;
+    this._scene = scene;
+    this._config = [
+      {
+        type: 'left',
+        rotation: 1.5 * Math.PI
+      },
+      {
+        type: 'right',
+        rotation: 0.5 * Math.PI
+      },
+      {
+        type: 'up',
+        rotation: 0
+      }
+    ];
+    this._config.forEach(el => {
+      this.buttons[el.type] = new ControlsSprite(scene, 0, 0, el);
+    });
   }
   adjustPositions() {
-      let width = this._scene.cameras.main.width;
-      let height = this._scene.cameras.main.height;
-      this.buttons.left.x = 70;
-      this.buttons.left.y = height - 70;
-      this.buttons.right.x = 70 + 90 + 45;
-      this.buttons.right.y = height - 70;
-      this.buttons.up.x = width - 70;
-      this.buttons.up.y = height - 70;
+    let width = this._scene.cameras.main.width;
+    let height = this._scene.cameras.main.height;
+    this.buttons.left.x = 70;
+    this.buttons.left.y = height - 70;
+    this.buttons.right.x = 70 + 90 + 25;
+    this.buttons.right.y = height - 70;
+    this.buttons.up.x = width - 70;
+    this.buttons.up.y = height - 70;
   }
   update() {
-      this.leftIsDown = false;
-      this.rightIsDown = false;
-      this.upIsDown = false;
-      let pointers = [];
-      if (this._scene.input.pointer1 != null) {
-        pointers.push(this._scene.input.pointer1);
-      }
-      if (this._scene.input.pointer2 != null) {
-        pointers.push(this._scene.input.pointer2);
-      }
-      let buttons = [this.buttons.left, this.buttons.right, this.buttons.up];
-      // check which pointer pressed which button
-      pointers.forEach(pointer => {
-          if (pointer.isDown) {
-              console.log(pointer.x, pointer.y);
-              let hit = buttons.filter(btn => {
-                  let x = btn.x - this._width / 2 < pointer.x && btn.x + this._width / 2 > pointer.x;
-                  let y = btn.y - this._height / 2 < pointer.y && btn.y + this._height / 2 > pointer.y;
-                  return x && y;
-              });
-              if (hit.length === 1) {
-                  switch (hit[0].type) {
-                      case 'left':
-                          this.leftIsDown = true;
-                          break;
-                      case 'right':
-                          this.rightIsDown = true;
-                          break;
-                      case 'up':
-                          this.upIsDown = true;
-                          break;
-                  }
-              }
+    this.leftIsDown = false;
+    this.rightIsDown = false;
+    this.upIsDown = false;
+    let pointers = [];
+    if (this._scene.input.pointer1 != null) {
+      pointers.push(this._scene.input.pointer1);
+    }
+    if (this._scene.input.pointer2 != null) {
+      pointers.push(this._scene.input.pointer2);
+    }
+    let buttons = [this.buttons.left, this.buttons.right, this.buttons.up];
+    // check which pointer pressed which button
+    pointers.forEach(pointer => {
+      if (pointer.isDown) {
+        console.log(pointer.x, pointer.y);
+        let hit = buttons.filter(btn => {
+          let x = btn.x - this._width / 2 < pointer.x && btn.x + this._width / 2 > pointer.x;
+          let y = btn.y - this._height / 2 < pointer.y && btn.y + this._height / 2 > pointer.y;
+          return x && y;
+        });
+        if (hit.length === 1) {
+          switch (hit[0].type) {
+            case 'left':
+              this.leftIsDown = true;
+              break;
+            case 'right':
+              this.rightIsDown = true;
+              break;
+            case 'up':
+              this.upIsDown = true;
+              break;
           }
-      });
+        }
+      }
+    });
   }
 }
 
@@ -258,7 +258,7 @@ class Game extends Phaser.Scene {
     // ================= BACKGROUND LAYERS =================
     this.backdrop = this.add.image(300, -5000, "bg1");
     this.add.image(300, -3400, "bg2").setScrollFactor(0.8);
-    this.add.image(300, -3600, "bg3").setScrollFactor(0.9);
+    this.add.image(300, -3400, "bg3").setScrollFactor(0.9);
     // this.add.image(300, -3400, "bg4").setScrollFactor(0.7);
     this.add.image(300, -2700, "stars1").setScrollFactor(0.5).setScale(0.6);
     this.add.image(300, -2800, "stars2").setScrollFactor(0.6).setScale(0.5);
@@ -281,7 +281,7 @@ class Game extends Phaser.Scene {
 
     // ================== PLATFORMS ==================
     // then create 5 platforms from the group
-    for (let i = 0; i < 5; ++i) {
+    for (let i = 0; i < 7; ++i) {
       let x = Phaser.Math.Between(80, 400); //320
       const y = 154 * i;
       // const y = startGameAtForTesting + Phaser.Math.Between(160, 170) * i;
@@ -424,7 +424,7 @@ class Game extends Phaser.Scene {
 
     // ================= hiwa =================
     this.hiwa = this.physics.add
-      .sprite(game.config.width/2+20, -4990, "hiwa")
+      .sprite(game.config.width / 2 + 20, -4990, "hiwa")
       .setScrollFactor(0.5)
       .setScale(1)
       .setDepth(1001)
@@ -504,7 +504,7 @@ class Game extends Phaser.Scene {
         },
         active: () => {
           this.endText = this.add
-            .text(game.config.width/2, 150, "Nga mihi Tane!\nFor delivering the dreams to me,\nI will give you another\npiece of your dream.", {
+            .text(game.config.width / 2, 150, "Nga mihi Tane!\nFor delivering the dreams to me,\nI will give you another\npiece of your dream.", {
               fontFamily: "Freckle Face",
               fontSize: 30,
               color: "#ffffff",
@@ -522,17 +522,17 @@ class Game extends Phaser.Scene {
 
       //================= HIWA'S KOHA =================
       this.hiwa.play("hiwaGive")
-      this.hiwa.on('animationcomplete', function(animation) {
-        if(animation.key === 'hiwaGive')
-        this.dream = this.dreamPiece.get(game.config.width/2+7,-11000+(740/2-20),"dreamDiamond").setDepth(1006).play("dreamDiamond").setScale(0.4)
+      this.hiwa.on('animationcomplete', function (animation) {
+        if (animation.key === 'hiwaGive')
+          this.dream = this.dreamPiece.get(game.config.width / 2 + 7, -11000 + (740 / 2 - 20), "dreamDiamond").setDepth(1006).play("dreamDiamond").setScale(0.4)
         this.sound.play("dreamSound")
       }, this);
-      
+
       // this.dream.body.setSize(200, 200)
       // this.orbs.get(x, y, "pinkOrb");
 
       //================= FIREWORKS =================
-      
+
       this.launchFireworks();
       // launch fireworks to the amount of dreams collected
       for (var i = 1; i < this.dreamCount; i++) {
@@ -545,25 +545,25 @@ class Game extends Phaser.Scene {
       // after fireworks - hiwa gives dream piece
 
       //
-     
+
     }
     else if (
       this.cameras.main.scrollY <= -11000
     ) {
 
-      
+
       // this.blueOrb.x =this.follower.vec.x
       // this.blueOrb.y =this.follower.vec.y
-      
+
       // this.graphics.lineStyle(1, 0xffffff, 1);
 
       // this.track.draw(this.graphics);
 
-    // this.track.getPoint(this.follower.t, this.follower.vec);
+      // this.track.getPoint(this.follower.t, this.follower.vec);
 
-    // graphics.fillStyle(0xff0000, 1);
-    // graphics.fillCircle(path.vec.x, path.vec.y, 8);
-    // this.blueOrb.setPosition(this.follower.vec.x, this.follower.vec.y);
+      // graphics.fillStyle(0xff0000, 1);
+      // graphics.fillCircle(path.vec.x, path.vec.y, 8);
+      // this.blueOrb.setPosition(this.follower.vec.x, this.follower.vec.y);
     }
 
     // ============= UPDATE PLATFORMS ==============
@@ -581,7 +581,7 @@ class Game extends Phaser.Scene {
         const platform = child;
         // add new platforms above once platforms disappear below bottom line.
         // if platform is 750 below current scrollY
-        if (platform.y >= scrollY + 750) {
+        if (platform.y >= scrollY + 960) {
           platform.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
           platform.x = Phaser.Math.Between(0, game.config.width); // random new x position
           platform.body.updateFromGameObject(); // update position
@@ -595,7 +595,7 @@ class Game extends Phaser.Scene {
         const cloud = child;
         // add new clouds above once clouds disappear below bottom line.
         // if cloud is 750 below current scrollY
-        if (cloud.y >= scrollY + 750) {
+        if (cloud.y >= scrollY + 960) {
           cloud.y = scrollY - Phaser.Math.Between(50, 70); // random new y position relative to scrollY
           cloud.x = Phaser.Math.Between(0, game.config.width); // random new x position
           cloud.body.updateFromGameObject(); // update position
@@ -774,7 +774,7 @@ class Game extends Phaser.Scene {
 
   addLightningAbove(sprite) {
     const randomLightning = Phaser.Math.Between(1, 3);
-    if (randomLightning !== 3) return 
+    if (randomLightning !== 3) return
     const y = sprite.y;
     const randomX = Phaser.Math.Between(50, game.config.width - 50);
     // const lightning = this.lightning.get(sprite.x, y, "lightning");
@@ -934,7 +934,7 @@ class GameIntro extends Phaser.Scene {
     super(sceneConfig);
   }
 
-  init(data) {}
+  init(data) { }
 
   preload() {
     // loading bar
@@ -1583,6 +1583,7 @@ class GameOver extends Phaser.Scene {
         families: ["Freckle Face", "Finger Paint", "Nosifer"],
       },
       active: () => {
+        // game over
         this.gameOver = this.add
           .text(
             game.config.width / 2,
@@ -1599,11 +1600,12 @@ class GameOver extends Phaser.Scene {
         this.gameOver.setOrigin();
         this.gameOver.setScrollFactor(0);
 
+        // restart button
         this.pressRestart = this.add
           .text(
             game.config.width / 2,
             game.config.height / 2,
-            "Press Space to Restart",
+            "Restart Game",
             {
               fontFamily: "Finger Paint",
               fontSize: 20,
@@ -1614,15 +1616,44 @@ class GameOver extends Phaser.Scene {
         this.pressRestart.setAlign("center");
         this.pressRestart.setOrigin();
         this.pressRestart.setScrollFactor(0);
+        this.pressRestart.setInteractive()
+        this.pressRestart.on('pointerdown', () => this.scene.start("game"));
+
+        // quit button
+        this.pressQuit = this.add
+          .text(
+            game.config.width / 2,
+            game.config.height / 2 + 80,
+            "Quit Game",
+            {
+              fontFamily: "Finger Paint",
+              fontSize: 20,
+              color: "#ffffff",
+            }
+          )
+          .setShadow(2, 2, "#333333", 2, false, true);
+        this.pressQuit.setAlign("center");
+        this.pressQuit.setOrigin();
+        this.pressQuit.setScrollFactor(0);
+        this.pressQuit.setInteractive()
+        this.pressQuit.on('pointerdown', () => {
+          //TODO: @FFF quit back to app
+          console.log("quit back to app")
+        });
+
+
       },
     });
+
+
+    // quit button
 
     this.input.keyboard.once("keydown-SPACE", () => {
       this.scene.start("game");
     });
-    this.input.on("pointerdown", () => {
-      this.scene.start("game");
-    });
+    // this.input.on("pointerdown", () => {
+    //   this.scene.start("game");
+    // });
   }
 }
 
