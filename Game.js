@@ -61,7 +61,7 @@ class ControlsSprite extends Phaser.GameObjects.Image {
     scene.add.existing(this);
     this.setX(x)
       .setY(y)
-      .setAlpha(0.1)
+      .setAlpha(0.4)
       .setRotation(config.rotation)
       .setScrollFactor(0)
       .setScale(0.5);
@@ -78,8 +78,8 @@ class ControlsSprite extends Phaser.GameObjects.Image {
 class Controls {
   constructor(scene) {
     this.buttons = {};
-    this._width = 96;
-    this._height = 96;
+    this._width = 120;
+    this._height = 120;
     this._scene = scene;
     this._config = [
       {
@@ -124,37 +124,27 @@ class Controls {
     // check which pointer pressed which button
     pointers.forEach(pointer => {
       if (pointer.isDown) {
-        console.log(pointer.x, pointer.y);
         let hit = buttons.filter(btn => {
           let x = btn.x - this._width / 2 < pointer.x && btn.x + this._width / 2 > pointer.x;
           let y = btn.y - this._height / 2 < pointer.y && btn.y + this._height / 2 > pointer.y;
           return x && y;
         });
-        console.log("hit", hit)
         if (hit.length === 1) {
-          // switch (hit[0].type) {
-          //   case 'left':
-          //     this.leftIsDown = true;
-          //     break;
-          //   case 'right':
-          //     this.rightIsDown = true;
-          //     break;
-          //   case 'up':
-          //     this.upIsDown = true;
-          //     break;
-          // }e
-          if (hit[0].type == "left") {
-            this.leftIsDown = true;
-          }
-          if (hit[0].type == "right") {
-            this.rightIsDown = true;
-          }
-          if (hit[0].type == "up") {
-            this.upIsDown = true;
+          switch (hit[0].type) {
+            case 'left':
+              this.leftIsDown = true;
+              break;
+            case 'right':
+              this.rightIsDown = true;
+              break;
+            case 'up':
+              this.upIsDown = true;
+              break;
           }
         }
       }
     });
+    console.log("upIsDown", this.upIsDown);
   }
 }
 
@@ -266,7 +256,10 @@ class Game extends Phaser.Scene {
     });
 
     // ================= BACKGROUND LAYERS =================
-    this.backdrop = this.add.image(300, -5000, "bg1");
+    // this.backdrop = this.add.image(300, -5000, "bg1");
+    this.backdrop = this.add.image(300, -9000, "bg1-top");
+    this.backdrop = this.add.image(300, -5000, "bg1-middle");
+    this.backdrop = this.add.image(300, -1000, "bg1-bottom");
     this.add.image(300, -3400, "bg2").setScrollFactor(0.8);
     this.add.image(300, -3400, "bg3").setScrollFactor(0.9);
     // this.add.image(300, -3400, "bg4").setScrollFactor(0.7);
@@ -307,16 +300,13 @@ class Game extends Phaser.Scene {
       platform.scale = 0.2;
       platform.setDepth(1004);
       platform.body.updateFromGameObject();
-
-      this.controls = new Controls(this);
-      this.controls.adjustPositions();
     }
 
     // this.startPlatform = this.platforms.create(this.player.x, this.player.y + 120, "platform").setScale(0.2);
     // this.startPlatform.body.updateFromGameObject() ;
 
     // ================== CLOUDS ==================
-    for (let i = 0; i < 5; ++i) {
+    for (let i = 0; i < 7; ++i) {
       // cloud x y positions
       let x = Phaser.Math.Between(80, 400); //320
       let y = -4000 + 154 * i;
@@ -344,6 +334,7 @@ class Game extends Phaser.Scene {
 
     this.player.setDepth(1003);
     this.player.body.setSize(30, 70).setOffset(50, 30);
+    this.jumptimer = 0;
 
     // ================= COLLIDERS =================
     this.physics.add.collider(this.platforms, this.player);
@@ -484,6 +475,10 @@ class Game extends Phaser.Scene {
       undefined,
       this
     );
+
+    this.input.addPointer(1);
+    this.controls = new Controls(this);
+    this.controls.adjustPositions();
   } // End of create()
 
   update(t, dt) {
@@ -493,7 +488,8 @@ class Game extends Phaser.Scene {
 
     //  ============= CAMERA CHASER (camera moving up) ==============
     if (this.cameras.main.scrollY > -11000) {
-      this.cameras.main.scrollY -= 1.2;
+      // -75 per second, divide by 1000 to get per millisecond, times by dt because dt is number of milliseconds since last update
+      this.cameras.main.scrollY -= 75 / 1000 * dt;
     } else if (
       this.cameras.main.scrollY <= -11000 &&
       this.gameFinished == false
@@ -646,7 +642,7 @@ class Game extends Phaser.Scene {
     // ---- Jump control ----
     if ((this.cursors.space.isDown || this.controls.upIsDown) && this.player.body.onFloor()) {
       //player is on the ground, so he is allowed to start a jump
-      this.jumptimer = 1;
+      this.jumptimer += dt;
       this.player.body.velocity.y = playerJump;
       this.player.play("taneJump", false);
 
@@ -685,19 +681,19 @@ class Game extends Phaser.Scene {
       }
     }
     // Jump hold
-    else if ((this.cursors.space.isDown || this.controls.upIsDown) && this.jumptimer != 0) {
+    else if ((this.cursors.space.isDown || this.controls.upIsDown) && this.jumptimer > 0) {
       //player is no longer on the ground, but is still holding the jump key
-      if (this.jumptimer > 30) {
-        // player has been holding jump for over 30 frames, it's time to stop him
+      if (this.jumptimer > 450) {
+        // player has been holding jump for over 450ms, it's time to stop him
         this.jumptimer = 0;
         // this.player.play('taneJump', false);
       } else {
-        // player is allowed to jump higher (not yet 30 frames of jumping)
-        this.jumptimer++;
+        // player is allowed to jump higher (not yet 450ms of jumping)
+        this.jumptimer += dt;
         this.player.body.velocity.y = playerJump;
         // this.player.play('taneJump', false);
       }
-    } else if (this.jumptimer != 0) {
+    } else if (this.jumptimer > 0) {
       //reset this.jumptimer since the player is no longer holding the jump key
       this.jumptimer = 0;
       // this.player.play('taneJump', false);
@@ -1041,7 +1037,23 @@ class GameIntro extends Phaser.Scene {
     // );
     this.load.image(
       "bg1",
-      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2.png?v=1649667680599"
+      // "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2.png?v=1649667680599"
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2jpg.jpg?v=1652935152480"
+    );
+    this.load.image(
+      "bg1-top",
+      // "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2.png?v=1649667680599"
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1-top.png?v=1652935432501"
+    );
+    this.load.image(
+      "bg1-middle",
+      // "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2.png?v=1649667680599"
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2-middle.png?v=1652935445020"
+    );
+    this.load.image(
+      "bg1-bottom",
+      // "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2.png?v=1649667680599"
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/bg1v2-bottom.png?v=1652935444454"
     );
     this.load.image(
       "bg2",
@@ -1146,7 +1158,6 @@ class GameIntro extends Phaser.Scene {
     );
     this.load.audio(
       "death",
-      // "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fquake-hurt.ogg?v=1603606002105"
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/death.mp3?v=1649896854596"
     );
     this.load.audio(
@@ -1556,6 +1567,11 @@ class GameOver extends Phaser.Scene {
     this.load.audio(
       "end-music",
       "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fgameover-music.mp3?v=1609537053554"
+    );
+    this.load.audio(
+      "death",
+      // "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/death.mp3?v=1649896854596"
+      "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/death_7_sean.mp3?v=1652937752144"
     );
   }
 
