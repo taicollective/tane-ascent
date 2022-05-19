@@ -1,7 +1,7 @@
 Tāne Ascent
 =================
 
-Live game: [https://celin-aroha-tane-ascent.glitch.me/](https://celin-aroha-tane-ascent.glitch.me/)
+Live game: [https://tane-ascent.glitch.me/](https://tane-ascent.glitch.me/)
 
 ------------
 

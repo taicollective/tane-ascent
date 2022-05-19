@@ -130,17 +130,27 @@ class Controls {
           let y = btn.y - this._height / 2 < pointer.y && btn.y + this._height / 2 > pointer.y;
           return x && y;
         });
+        console.log("hit", hit)
         if (hit.length === 1) {
-          switch (hit[0].type) {
-            case 'left':
-              this.leftIsDown = true;
-              break;
-            case 'right':
-              this.rightIsDown = true;
-              break;
-            case 'up':
-              this.upIsDown = true;
-              break;
+          // switch (hit[0].type) {
+          //   case 'left':
+          //     this.leftIsDown = true;
+          //     break;
+          //   case 'right':
+          //     this.rightIsDown = true;
+          //     break;
+          //   case 'up':
+          //     this.upIsDown = true;
+          //     break;
+          // }e
+          if (hit[0].type == "left") {
+            this.leftIsDown = true;
+          }
+          if (hit[0].type == "right") {
+            this.rightIsDown = true;
+          }
+          if (hit[0].type == "up") {
+            this.upIsDown = true;
           }
         }
       }
@@ -1542,6 +1552,10 @@ class GameOver extends Phaser.Scene {
     this.load.audio(
       "falling",
       "https://cdn.glitch.global/d000a9ec-7a88-4c14-9cdd-f194575da68e/Retro%20Descending%20Short%2020.wav?v=1649892479903"
+    );
+    this.load.audio(
+      "end-music",
+      "https://cdn.glitch.com/e46a9959-9af7-4acd-a785-ff3bc76f44d0%2Fgameover-music.mp3?v=1609537053554"
     );
   }
 
